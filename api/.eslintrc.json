@@ -1,0 +1,37 @@
+{
+  "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended"
+  ],
+  "plugins": [
+      "@typescript-eslint",
+      "prettier"
+  ],
+  "env": {
+      "browser": true,
+      "es2021": true
+  },
+  "globals": {
+      "Atomics": "readonly",
+      "SharedArrayBuffer": "readonly"
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+      "ecmaFeatures": {
+          "jsx": true
+      },
+      "ecmaVersion": "latest",
+      "sourceType": "module",
+      "project": "./tsconfig.json"
+  },
+  "rules": {
+      "linebreak-style": "off",
+      "prettier/prettier": [
+          "error",
+          {
+              "endOfLine": "auto"
+          }
+      ]
+  }
+}
