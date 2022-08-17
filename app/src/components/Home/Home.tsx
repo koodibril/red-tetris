@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import ScoreComponent from "./components/Score/Score";
 import GridComponent from "./components/Grid/Grid";
 import TetraminosComponent from "./components/Tetraminos/Tetraminos";
+import { useInterval } from "src/hooks/useInterval";
 
 const shape1 = [
   [0, 0, 0, 0],
@@ -54,6 +55,7 @@ const Home: React.FC = () => {
   // value: 2 => Played tetra
 
   useEffect(() => {
+    let timer: NodeJS.Timeout | undefined;
     if (tetra === undefined) {
       const falseTetra = {
         x: 4,
@@ -65,7 +67,14 @@ const Home: React.FC = () => {
       setTetra(falseTetra);
     }
   });
-
+  const tick = () => {
+    if (tetra) {
+      const oldTetra = { ...tetra };
+      oldTetra.x = oldTetra.x + 1;
+      setTetra(oldTetra);
+    }
+  };
+  useInterval(tick, 600);
   return (
     <>
       {tetra ? <GridComponent tetra={tetra}></GridComponent> : null}
