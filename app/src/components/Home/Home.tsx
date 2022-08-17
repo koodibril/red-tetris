@@ -60,7 +60,7 @@ const Home: React.FC = () => {
         y: 5,
         value: 1,
         color: "red",
-        shape: shape7,
+        shape: shape3,
       };
       setTetra(falseTetra);
     }
