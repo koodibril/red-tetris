@@ -4,7 +4,7 @@ import { Col, Row, Button } from "antd";
 import { JwtPayload } from "jsonwebtoken";
 import jwt from "jwt-decode";
 
-const Display: React.FC<{ message: string }> = (props) => {
+const Score: React.FC<{ message: string }> = (props) => {
   const [username, setUsername] = useState("");
   // const [timeleft, setTimeleft] = useState("");
   const user = localStorage.getItem("user");
@@ -14,6 +14,7 @@ const Display: React.FC<{ message: string }> = (props) => {
     localStorage.removeItem("user");
     pushState("/auth/login");
   };
+
   useMemo(() => {
     if (user) {
       const decoded: JwtPayload = jwt(user);
@@ -21,6 +22,7 @@ const Display: React.FC<{ message: string }> = (props) => {
       setUsername(decoded.username);
     }
   }, [user]);
+
   return (
     <Row>
       <Col>
@@ -34,4 +36,4 @@ const Display: React.FC<{ message: string }> = (props) => {
   );
 };
 
-export default Display;
+export default Score;

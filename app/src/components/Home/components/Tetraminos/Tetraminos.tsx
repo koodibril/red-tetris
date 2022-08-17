@@ -1,0 +1,78 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigation } from "src/ducks/navigation/navigation";
+import { Col, Row, Button } from "antd";
+import { JwtPayload } from "jsonwebtoken";
+import jwt from "jwt-decode";
+
+const Tetraminos: React.FC<{ tetra: any; control: any }> = (props) => {
+  const rotateClockwise = (a: any) => {
+    const n = a.length;
+    for (let i = 0; i < n / 2; i++) {
+      for (let j = i; j < n - i - 1; j++) {
+        const tmp = a[i][j];
+        a[i][j] = a[n - j - 1][i];
+        a[n - j - 1][i] = a[n - i - 1][n - j - 1];
+        a[n - i - 1][n - j - 1] = a[j][n - i - 1];
+        a[j][n - i - 1] = tmp;
+      }
+    }
+    return a;
+  };
+  const moveDown = (tetra: any) => {
+    console.log("tetraminos going down");
+    const newTetra = { ...tetra };
+    if (newTetra.x + 4 < 21) {
+      newTetra.x = newTetra.x + 1;
+    }
+    return newTetra;
+  };
+  const rotate = (tetra: any) => {
+    console.log("tetraminos rotating");
+    const oldTetra = { ...tetra };
+    oldTetra.shape = rotateClockwise(tetra.shape);
+    return oldTetra;
+  };
+  const moveLeft = (tetra: any) => {
+    const newTetra = { ...tetra };
+    if (newTetra.y - 1 > 0) {
+      newTetra.y = newTetra.y - 1;
+    }
+    return newTetra;
+  };
+  const moveRight = (tetra: any) => {
+    console.log("tetraminos going right");
+    const newTetra = { ...tetra };
+    if (newTetra.y + 4 < 11) {
+      newTetra.y = newTetra.y + 1;
+    }
+    return newTetra;
+  };
+  const handleKeyPress = (e: any) => {
+    e.preventDefault();
+    const key = e.key;
+    let newTetra;
+    switch (key) {
+      case "ArrowDown":
+        newTetra = moveDown(props.tetra);
+        break;
+      case "ArrowUp":
+        newTetra = rotate(props.tetra);
+        break;
+      case "ArrowLeft":
+        newTetra = moveLeft(props.tetra);
+        break;
+      case "ArrowRight":
+        newTetra = moveRight(props.tetra);
+        break;
+    }
+    props.control(newTetra);
+  };
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  });
+
+  return <></>;
+};
+
+export default Tetraminos;
