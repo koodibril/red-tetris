@@ -3,6 +3,44 @@ import ScoreComponent from "./components/Score/Score";
 import GridComponent from "./components/Grid/Grid";
 import TetraminosComponent from "./components/Tetraminos/Tetraminos";
 
+const shape1 = [
+  [0, 0, 0, 0],
+  [1, 1, 1, 1],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+];
+const shape2 = [
+  [1, 0, 0],
+  [1, 1, 1],
+  [0, 0, 0],
+];
+const shape3 = [
+  [0, 0, 1],
+  [1, 1, 1],
+  [0, 0, 0],
+];
+const shape4 = [
+  [0, 1, 1, 0],
+  [0, 1, 1, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+];
+const shape5 = [
+  [0, 1, 1],
+  [1, 1, 0],
+  [0, 0, 0],
+];
+const shape6 = [
+  [0, 1, 0],
+  [1, 1, 1],
+  [0, 0, 0],
+];
+const shape7 = [
+  [1, 1, 0],
+  [0, 1, 1],
+  [0, 0, 0],
+];
+
 const Home: React.FC = () => {
   const [tetra, setTetra] = useState<{
     x: number;
@@ -22,12 +60,7 @@ const Home: React.FC = () => {
         y: 5,
         value: 1,
         color: "red",
-        shape: [
-          [1, 0, 0, 0],
-          [1, 1, 1, 1],
-          [0, 0, 0, 0],
-          [0, 0, 0, 0],
-        ],
+        shape: shape7,
       };
       setTetra(falseTetra);
     }

@@ -21,7 +21,7 @@ const Tetraminos: React.FC<{ tetra: any; control: any }> = (props) => {
   const moveDown = (tetra: any) => {
     console.log("tetraminos going down");
     const newTetra = { ...tetra };
-    if (newTetra.x + 4 < 21) {
+    if (newTetra.x + 1 < 21) {
       newTetra.x = newTetra.x + 1;
     }
     return newTetra;
@@ -33,8 +33,22 @@ const Tetraminos: React.FC<{ tetra: any; control: any }> = (props) => {
     return oldTetra;
   };
   const moveLeft = (tetra: any) => {
+    console.log("tetraminos going left");
     const newTetra = { ...tetra };
-    if (newTetra.y - 1 > 0) {
+    let matrixLength = 4;
+    tetra.shape.map((row: any, rIndex: number) => {
+      let rowLength = 4;
+      row.map((cell: any, cIndex: number) => {
+        if (cell === 1 && cIndex < rowLength) {
+          rowLength = cIndex;
+        }
+      });
+      if (rowLength < matrixLength) {
+        matrixLength = rowLength;
+      }
+    });
+    console.log(matrixLength);
+    if (newTetra.y + matrixLength - 1 > 0) {
       newTetra.y = newTetra.y - 1;
     }
     return newTetra;
@@ -42,7 +56,19 @@ const Tetraminos: React.FC<{ tetra: any; control: any }> = (props) => {
   const moveRight = (tetra: any) => {
     console.log("tetraminos going right");
     const newTetra = { ...tetra };
-    if (newTetra.y + 4 < 11) {
+    let matrixLength = 1;
+    tetra.shape.map((row: any, rIndex: number) => {
+      let rowLength = 1;
+      row.map((cell: any, cIndex: number) => {
+        if (cell === 1 && cIndex > rowLength) {
+          rowLength = cIndex;
+        }
+      });
+      if (rowLength > matrixLength) {
+        matrixLength = rowLength;
+      }
+    });
+    if (newTetra.y + matrixLength + 1 < 11) {
       newTetra.y = newTetra.y + 1;
     }
     return newTetra;
