@@ -3,80 +3,128 @@ import ScoreComponent from "./components/Score/Score";
 import GridComponent from "./components/Grid/Grid";
 import TetraminosComponent from "./components/Tetraminos/Tetraminos";
 import { useInterval } from "src/hooks/useInterval";
+import { Tetraminos } from "./components/Tetraminos/Tetraminos.d";
+import { Cell } from "./components/Grid/Grid.d";
 
-const shape1 = [
-  [0, 0, 0, 0],
-  [1, 1, 1, 1],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
-];
-const shape2 = [
-  [1, 0, 0],
-  [1, 1, 1],
-  [0, 0, 0],
-];
-const shape3 = [
-  [0, 0, 1],
-  [1, 1, 1],
-  [0, 0, 0],
-];
-const shape4 = [
-  [0, 1, 1, 0],
-  [0, 1, 1, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
-];
-const shape5 = [
-  [0, 1, 1],
-  [1, 1, 0],
-  [0, 0, 0],
-];
-const shape6 = [
-  [0, 1, 0],
-  [1, 1, 1],
-  [0, 0, 0],
-];
-const shape7 = [
-  [1, 1, 0],
-  [0, 1, 1],
-  [0, 0, 0],
+const tetraminos = [
+  {
+    x: 4,
+    y: 5,
+    value: 2,
+    color: "cyan",
+    shape: [
+      [0, 0, 0, 0],
+      [1, 1, 1, 1],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ],
+  },
+  {
+    x: 4,
+    y: 5,
+    value: 2,
+    color: "blue",
+    shape: [
+      [1, 0, 0],
+      [1, 1, 1],
+      [0, 0, 0],
+    ],
+  },
+  {
+    x: 4,
+    y: 5,
+    value: 2,
+    color: "orange",
+    shape: [
+      [0, 0, 1],
+      [1, 1, 1],
+      [0, 0, 0],
+    ],
+  },
+  {
+    x: 4,
+    y: 5,
+    value: 2,
+    color: "yellow",
+    shape: [
+      [0, 1, 1, 0],
+      [0, 1, 1, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ],
+  },
+  {
+    x: 4,
+    y: 5,
+    value: 2,
+    color: "green",
+    shape: [
+      [0, 1, 1],
+      [1, 1, 0],
+      [0, 0, 0],
+    ],
+  },
+  {
+    x: 4,
+    y: 5,
+    value: 2,
+    color: "purple",
+    shape: [
+      [0, 1, 0],
+      [1, 1, 1],
+      [0, 0, 0],
+    ],
+  },
+  {
+    x: 4,
+    y: 5,
+    value: 2,
+    color: "red",
+    shape: [
+      [1, 1, 0],
+      [0, 1, 1],
+      [0, 0, 0],
+    ],
+  },
 ];
 
 const Home: React.FC = () => {
-  const [tetra, setTetra] = useState<{
-    x: number;
-    y: number;
-    value: number;
-    color: string;
-    shape: number[][];
-  }>();
-  const [merge, setMerge] = useState<{ value: string }[][]>();
+  const [tetra, setTetra] = useState<Tetraminos>();
+  const [merge, setMerge] = useState<Cell[][]>();
   // value: 0 => Empty
-  // value: 1 => Moving tetra
-  // value: 2 => Played tetra
+  // value: 1 => Block
+  // value: 2 => Moving tetra
+  // value: 3 => Played tetra
 
-  const grid = useMemo(() => {
-    let grid: { value: string }[][] = [];
-    if (merge) {
-      grid = [...merge];
-      console.log("grid copy merge");
-    }
+  const generateGrid = () => {
+    const grid: Cell[][] = [];
     for (let i = 0; i < 22; i++) {
       const newCol = [];
       for (let j = 0; j < 12; j++) {
         if (i === 0 || j === 0 || i === 21 || j === 11) {
-          newCol.push({ x: i, y: j, value: "grey" });
+          newCol.push({ value: 1, color: "grey" });
         } else {
-          newCol.push({ x: i, y: j, value: "lightgrey" });
+          newCol.push({ value: 0, color: "lightgrey" });
         }
       }
       grid.push(newCol);
+    }
+    return grid;
+  };
+  const grid = useMemo(() => {
+    const grid: Cell[][] = generateGrid();
+    if (merge) {
+      for (let i = 0; i < 22; i++) {
+        for (let j = 0; j < 12; j++) {
+          grid[i][j] = { ...merge[i][j] };
+        }
+      }
     }
     if (tetra) {
       tetra.shape.map((row: any, rIndex: number) => {
         row.map((cell: any, cIndex: number) => {
           if (cell === 1) {
-            grid[tetra.x + rIndex][tetra.y + cIndex].value = tetra.color;
+            grid[tetra.x + rIndex][tetra.y + cIndex].color = tetra.color;
           }
         });
       });
@@ -90,8 +138,8 @@ const Home: React.FC = () => {
         if (
           cell === 1 &&
           grid &&
-          grid[tetra.x + rIndex][tetra.y + cIndex].value !== "lightgrey" &&
-          grid[tetra.x + rIndex][tetra.y + cIndex].value !== tetra.color
+          grid[tetra.x + rIndex][tetra.y + cIndex].value !== 0 &&
+          grid[tetra.x + rIndex][tetra.y + cIndex].value !== 2
         ) {
           touch = true;
         }
@@ -103,29 +151,43 @@ const Home: React.FC = () => {
     const newMerge = grid;
     tetra.shape.map((row: any, rIndex: number) => {
       row.map((cell: any, cIndex: number) => {
-        if (cell === 1) {
-          newMerge[tetra.x + rIndex][tetra.y + cIndex].value =
-            "light" + tetra.color;
+        if (cell === 1 || cell === 3) {
+          newMerge[tetra.x + rIndex][tetra.y + cIndex].value = 3;
         }
       });
+    });
+    newMerge.map((row, index) => {
+      if (
+        !row.find((cell) => cell.value === 0) &&
+        index !== 0 &&
+        index !== 21
+      ) {
+        console.log("ligne " + index + " complete !");
+        const newLine = [];
+        for (let j = 0; j < 12; j++) {
+          if (index === 0 || j === 0 || index === 21 || j === 11) {
+            newLine.push({ value: 1, color: "grey" });
+          } else {
+            newLine.push({ value: 0, color: "lightgrey" });
+          }
+        }
+        newMerge.splice(index, 1);
+        newMerge.splice(1, 0, newLine);
+      }
     });
     setMerge(newMerge);
     setTetra(undefined);
   };
   useEffect(() => {
     if (tetra === undefined) {
-      const falseTetra = {
-        x: 4,
-        y: 5,
-        value: 1,
-        color: "red",
-        shape: shape3,
-      };
+      const falseTetra = tetraminos[
+        Math.floor(Math.random() * (6 - 0)) + 0
+      ] as Tetraminos;
       setTetra(falseTetra);
     }
   });
   const tick = () => {
-    if (tetra && tetra.value === 1) {
+    if (tetra && tetra.value === 2) {
       const oldTetra = { ...tetra };
       oldTetra.x = oldTetra.x + 1;
       if (checkMerge(oldTetra)) {
@@ -137,13 +199,14 @@ const Home: React.FC = () => {
       }
     }
   };
-  useInterval(tick, 2000);
+  useInterval(tick, 600);
   return (
     <>
       {tetra ? <GridComponent grid={grid}></GridComponent> : null}
       <TetraminosComponent
         tetra={tetra}
         control={setTetra}
+        grid={grid}
       ></TetraminosComponent>
     </>
   );

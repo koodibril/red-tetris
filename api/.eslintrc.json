@@ -23,7 +23,8 @@
       },
       "ecmaVersion": "latest",
       "sourceType": "module",
-      "project": "./tsconfig.json"
+      "project": "./tsconfig.json",
+      "rootDir": "./"
   },
   "rules": {
       "linebreak-style": "off",

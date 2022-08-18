@@ -5,15 +5,15 @@ const Grid: React.FC<{
   grid: any;
 }> = (props) => {
   const generateGrid = () => {
-    return props.grid.map((el: any) => {
+    return props.grid.map((el: any, rIndex: number) => {
       return (
-        <div className={styles.row} key={el[0].x}>
-          {el.map((cas: any) => {
+        <div className={styles.row} key={rIndex}>
+          {el.map((cas: any, cIndex: number) => {
             const cell = (
               <div
                 className={styles.cell}
-                style={{ backgroundColor: cas.value }}
-                key={cas.y}
+                style={{ backgroundColor: cas.color }}
+                key={cIndex}
               ></div>
             );
             return cell;
