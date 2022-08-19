@@ -8,7 +8,7 @@ import { Cell } from "./components/Grid/Grid.d";
 
 const tetraminos = [
   {
-    x: 4,
+    x: 0,
     y: 5,
     value: 2,
     color: "cyan",
@@ -20,7 +20,7 @@ const tetraminos = [
     ],
   },
   {
-    x: 4,
+    x: 0,
     y: 5,
     value: 2,
     color: "blue",
@@ -31,7 +31,7 @@ const tetraminos = [
     ],
   },
   {
-    x: 4,
+    x: 0,
     y: 5,
     value: 2,
     color: "orange",
@@ -42,7 +42,7 @@ const tetraminos = [
     ],
   },
   {
-    x: 4,
+    x: 0,
     y: 5,
     value: 2,
     color: "yellow",
@@ -54,7 +54,7 @@ const tetraminos = [
     ],
   },
   {
-    x: 4,
+    x: 0,
     y: 5,
     value: 2,
     color: "green",
@@ -65,7 +65,7 @@ const tetraminos = [
     ],
   },
   {
-    x: 4,
+    x: 0,
     y: 5,
     value: 2,
     color: "purple",
@@ -76,7 +76,7 @@ const tetraminos = [
     ],
   },
   {
-    x: 4,
+    x: 0,
     y: 5,
     value: 2,
     color: "red",
@@ -91,6 +91,7 @@ const tetraminos = [
 const Home: React.FC = () => {
   const [tetra, setTetra] = useState<Tetraminos>();
   const [merge, setMerge] = useState<Cell[][]>();
+  const [status, setStatus] = useState<string>();
   // value: 0 => Empty
   // value: 1 => Block
   // value: 2 => Moving tetra
@@ -176,7 +177,11 @@ const Home: React.FC = () => {
       }
     });
     setMerge(newMerge);
-    setTetra(undefined);
+    if (newMerge[1].find((cell) => cell.value === 3)) {
+      setStatus("loser");
+    } else {
+      setTetra(undefined);
+    }
   };
   useEffect(() => {
     if (tetra === undefined) {
@@ -187,22 +192,24 @@ const Home: React.FC = () => {
     }
   });
   const tick = () => {
-    if (tetra && tetra.value === 2) {
-      const oldTetra = { ...tetra };
-      oldTetra.x = oldTetra.x + 1;
-      if (checkMerge(oldTetra)) {
-        oldTetra.value = 2;
-        oldTetra.x = oldTetra.x - 1;
-        mergeBoard(oldTetra);
-      } else {
-        setTetra(oldTetra);
+    if (status !== "loser") {
+      if (tetra && tetra.value === 2) {
+        const oldTetra = { ...tetra };
+        oldTetra.x = oldTetra.x + 1;
+        if (checkMerge(oldTetra)) {
+          oldTetra.value = 2;
+          oldTetra.x = oldTetra.x - 1;
+          mergeBoard(oldTetra);
+        } else {
+          setTetra(oldTetra);
+        }
       }
     }
   };
   useInterval(tick, 600);
   return (
     <>
-      {tetra ? <GridComponent grid={grid}></GridComponent> : null}
+      <GridComponent grid={grid}></GridComponent>
       <TetraminosComponent
         tetra={tetra}
         control={setTetra}

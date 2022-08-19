@@ -12,7 +12,10 @@ const Grid: React.FC<{
             const cell = (
               <div
                 className={styles.cell}
-                style={{ backgroundColor: cas.color }}
+                style={{
+                  backgroundColor: cas.color,
+                  borderColor: cas.color,
+                }}
                 key={cIndex}
               ></div>
             );
