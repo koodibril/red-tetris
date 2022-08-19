@@ -79,12 +79,22 @@ const Tetraminos: React.FC<{ tetra: any; control: any; grid: any }> = (
     }
     return newTetra;
   };
+  const fallDown = (tetra: any) => {
+    while (!checkMerge(tetra)) {
+      console.log("going down");
+      tetra.x = tetra.x + 1;
+      props.control(tetra);
+    }
+    tetra.x = tetra.x - 1;
+    props.control(tetra);
+  };
   const handleKeyPress = (e: any) => {
     e.preventDefault();
     const key = e.key;
     let newTetra;
     switch (key) {
-      case "ArrowDown":
+      case " ":
+        console.log("down by one");
         newTetra = moveDown(props.tetra);
         props.control(newTetra);
         break;
@@ -99,6 +109,10 @@ const Tetraminos: React.FC<{ tetra: any; control: any; grid: any }> = (
       case "ArrowRight":
         newTetra = moveRight(props.tetra);
         props.control(newTetra);
+        break;
+      case "ArrowDown":
+        console.log("hey");
+        fallDown(props.tetra);
         break;
     }
   };
