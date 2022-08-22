@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ScoreComponent from "./components/Score/Score";
 import GridComponent from "./components/Grid/Grid";
-import TetraminosComponent from "./components/Tetraminos/Tetraminos";
+import ActionsComponent from "./components/Tetraminos/Tetraminos";
 import { useInterval } from "src/hooks/useInterval";
 import { Tetraminos } from "./components/Tetraminos/Tetraminos.d";
 import { Cell } from "./components/Grid/Grid.d";
+import { Col, Row } from "antd";
 
 const tetraminos = [
   {
@@ -91,7 +92,7 @@ const tetraminos = [
 const Home: React.FC = () => {
   const [tetra, setTetra] = useState<Tetraminos>();
   const [merge, setMerge] = useState<Cell[][]>();
-  const [status, setStatus] = useState<string>();
+  const [gameStatus, setGameStatus] = useState<string>("Playing");
   // value: 0 => Empty
   // value: 1 => Block
   // value: 2 => Moving tetra
@@ -122,8 +123,8 @@ const Home: React.FC = () => {
       }
     }
     if (tetra) {
-      tetra.shape.map((row: any, rIndex: number) => {
-        row.map((cell: any, cIndex: number) => {
+      tetra.shape.map((row: number[], rIndex: number) => {
+        row.map((cell: number, cIndex: number) => {
           if (cell === 1) {
             grid[tetra.x + rIndex][tetra.y + cIndex].color = tetra.color;
           }
@@ -132,10 +133,10 @@ const Home: React.FC = () => {
     }
     return grid;
   }, [tetra, merge]);
-  const checkMerge = (tetra: any) => {
+  const checkMerge = (tetra: Tetraminos) => {
     let touch = false;
-    tetra.shape.map((row: any, rIndex: number) => {
-      row.map((cell: any, cIndex: number) => {
+    tetra.shape.map((row: number[], rIndex: number) => {
+      row.map((cell: number, cIndex: number) => {
         if (
           cell === 1 &&
           grid &&
@@ -148,10 +149,10 @@ const Home: React.FC = () => {
     });
     return touch;
   };
-  const mergeBoard = (tetra: any) => {
+  const mergeBoard = (tetra: Tetraminos) => {
     const newMerge = grid;
-    tetra.shape.map((row: any, rIndex: number) => {
-      row.map((cell: any, cIndex: number) => {
+    tetra.shape.map((row: number[], rIndex: number) => {
+      row.map((cell: number, cIndex: number) => {
         if (cell === 1 || cell === 3) {
           newMerge[tetra.x + rIndex][tetra.y + cIndex].value = 3;
         }
@@ -163,7 +164,6 @@ const Home: React.FC = () => {
         index !== 0 &&
         index !== 21
       ) {
-        console.log("ligne " + index + " complete !");
         const newLine = [];
         for (let j = 0; j < 12; j++) {
           if (index === 0 || j === 0 || index === 21 || j === 11) {
@@ -178,7 +178,7 @@ const Home: React.FC = () => {
     });
     setMerge(newMerge);
     if (newMerge[1].find((cell) => cell.value === 3)) {
-      setStatus("loser");
+      setGameStatus("Game Over");
     } else {
       setTetra(undefined);
     }
@@ -192,7 +192,7 @@ const Home: React.FC = () => {
     }
   });
   const tick = () => {
-    if (status !== "loser") {
+    if (gameStatus !== "Game Over") {
       if (tetra && tetra.value === 2) {
         const oldTetra = { ...tetra };
         oldTetra.x = oldTetra.x + 1;
@@ -208,14 +208,22 @@ const Home: React.FC = () => {
   };
   useInterval(tick, 600);
   return (
-    <>
-      <GridComponent grid={grid}></GridComponent>
-      <TetraminosComponent
-        tetra={tetra}
-        control={setTetra}
-        grid={grid}
-      ></TetraminosComponent>
-    </>
+    <Row>
+      <Col span={8} offset={4}>
+        <GridComponent grid={grid}></GridComponent>
+        {tetra ? (
+          <ActionsComponent
+            tetra={tetra}
+            control={setTetra}
+            grid={grid}
+            gameStatus={gameStatus}
+          ></ActionsComponent>
+        ) : null}
+      </Col>
+      <Col span={8} offset={4}>
+        <ScoreComponent gameStatus={gameStatus}></ScoreComponent>
+      </Col>
+    </Row>
   );
 };
 

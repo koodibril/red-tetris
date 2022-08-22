@@ -1,8 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useNavigation } from "src/ducks/navigation/navigation";
-import { Col, Row, Button } from "antd";
-import { JwtPayload } from "jsonwebtoken";
-import jwt from "jwt-decode";
+import React, { useEffect } from "react";
 import {
   matrixSizeBottom,
   matrixSizeLeft,
@@ -10,16 +6,22 @@ import {
   rotateClockwise,
   rotateCounterClockwise,
 } from "src/utils/utils";
+import { Cell } from "../Grid/Grid.d";
+import { Tetraminos } from "./Tetraminos.d";
 
-const Tetraminos: React.FC<{ tetra: any; control: any; grid: any }> = (
-  props
-) => {
-  const checkMerge = (tetra: any) => {
+const Actions: React.FC<{
+  tetra: Tetraminos;
+  control: React.Dispatch<React.SetStateAction<Tetraminos | undefined>>;
+  grid: Cell[][];
+  gameStatus: string;
+}> = (props) => {
+  const checkMerge = (tetra: Tetraminos) => {
     let touch = false;
-    tetra.shape.map((row: any, rIndex: number) => {
-      row.map((cell: any, cIndex: number) => {
+    tetra.shape.map((row: number[], rIndex: number) => {
+      row.map((cell: number, cIndex: number) => {
         if (
           cell === 1 &&
+          rIndex !== 0 &&
           props.grid &&
           props.grid[tetra.x + rIndex][tetra.y + cIndex].value !== 0 &&
           props.grid[tetra.x + rIndex][tetra.y + cIndex].value !== 2
@@ -30,7 +32,7 @@ const Tetraminos: React.FC<{ tetra: any; control: any; grid: any }> = (
     });
     return touch;
   };
-  const moveDown = (tetra: any) => {
+  const moveDown = (tetra: Tetraminos) => {
     const newTetra = { ...tetra };
     if (newTetra.x + matrixSizeBottom(tetra.shape) + 1 < 21) {
       newTetra.x = newTetra.x + 1;
@@ -40,7 +42,7 @@ const Tetraminos: React.FC<{ tetra: any; control: any; grid: any }> = (
     }
     return newTetra;
   };
-  const rotate = (tetra: any) => {
+  const rotate = (tetra: Tetraminos) => {
     const oldTetra = { ...tetra };
     oldTetra.shape = rotateClockwise(tetra.shape);
     const sizeLeft = matrixSizeLeft(oldTetra.shape);
@@ -59,7 +61,7 @@ const Tetraminos: React.FC<{ tetra: any; control: any; grid: any }> = (
     }
     return oldTetra;
   };
-  const moveLeft = (tetra: any) => {
+  const moveLeft = (tetra: Tetraminos) => {
     const newTetra = { ...tetra };
     if (newTetra.y + matrixSizeLeft(tetra.shape) - 1 > 0) {
       newTetra.y = newTetra.y - 1;
@@ -69,7 +71,7 @@ const Tetraminos: React.FC<{ tetra: any; control: any; grid: any }> = (
     }
     return newTetra;
   };
-  const moveRight = (tetra: any) => {
+  const moveRight = (tetra: Tetraminos) => {
     const newTetra = { ...tetra };
     if (newTetra.y + matrixSizeRight(tetra.shape) + 1 < 11) {
       newTetra.y = newTetra.y + 1;
@@ -79,41 +81,40 @@ const Tetraminos: React.FC<{ tetra: any; control: any; grid: any }> = (
     }
     return newTetra;
   };
-  const fallDown = (tetra: any) => {
-    while (!checkMerge(tetra)) {
-      console.log("going down");
-      tetra.x = tetra.x + 1;
-      props.control(tetra);
+  const fallDown = (tetra: Tetraminos) => {
+    const newTetra = { ...tetra };
+    while (!checkMerge(newTetra)) {
+      newTetra.x = newTetra.x + 1;
     }
-    tetra.x = tetra.x - 1;
-    props.control(tetra);
+    newTetra.x = newTetra.x - 1;
+    props.control(newTetra);
   };
-  const handleKeyPress = (e: any) => {
+  const handleKeyPress = (e: KeyboardEvent) => {
     e.preventDefault();
     const key = e.key;
     let newTetra;
-    switch (key) {
-      case " ":
-        console.log("down by one");
-        newTetra = moveDown(props.tetra);
-        props.control(newTetra);
-        break;
-      case "ArrowUp":
-        newTetra = rotate(props.tetra);
-        props.control(newTetra);
-        break;
-      case "ArrowLeft":
-        newTetra = moveLeft(props.tetra);
-        props.control(newTetra);
-        break;
-      case "ArrowRight":
-        newTetra = moveRight(props.tetra);
-        props.control(newTetra);
-        break;
-      case "ArrowDown":
-        console.log("hey");
-        fallDown(props.tetra);
-        break;
+    if (props.gameStatus === "Playing") {
+      switch (key) {
+        case " ":
+          newTetra = moveDown(props.tetra);
+          props.control(newTetra);
+          break;
+        case "ArrowUp":
+          newTetra = rotate(props.tetra);
+          props.control(newTetra);
+          break;
+        case "ArrowLeft":
+          newTetra = moveLeft(props.tetra);
+          props.control(newTetra);
+          break;
+        case "ArrowRight":
+          newTetra = moveRight(props.tetra);
+          props.control(newTetra);
+          break;
+        case "ArrowDown":
+          fallDown(props.tetra);
+          break;
+      }
     }
   };
   useEffect(() => {
@@ -124,4 +125,4 @@ const Tetraminos: React.FC<{ tetra: any; control: any; grid: any }> = (
   return <></>;
 };
 
-export default Tetraminos;
+export default Actions;
