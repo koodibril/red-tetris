@@ -21,7 +21,7 @@ const Actions: React.FC<{
       row.map((cell: number, cIndex: number) => {
         if (
           cell === 1 &&
-          rIndex !== 0 &&
+          tetra.x + rIndex !== 0 &&
           props.grid &&
           props.grid[tetra.x + rIndex][tetra.y + cIndex].value !== 0 &&
           props.grid[tetra.x + rIndex][tetra.y + cIndex].value !== 2
@@ -100,8 +100,17 @@ const Actions: React.FC<{
           props.control(newTetra);
           break;
         case "ArrowUp":
-          newTetra = rotate(props.tetra);
-          props.control(newTetra);
+          if (
+            props.tetra.shape[0][2] === 1 &&
+            props.tetra.shape[0][1] === 1 &&
+            props.tetra.shape[1][2] === 1 &&
+            props.tetra.shape[1][1] === 1
+          ) {
+            break;
+          } else {
+            newTetra = rotate(props.tetra);
+            props.control(newTetra);
+          }
           break;
         case "ArrowLeft":
           newTetra = moveLeft(props.tetra);

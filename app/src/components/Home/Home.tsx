@@ -6,88 +6,7 @@ import { useInterval } from "src/hooks/useInterval";
 import { Tetraminos } from "./components/Tetraminos/Tetraminos.d";
 import { Cell } from "./components/Grid/Grid.d";
 import { Col, Row } from "antd";
-
-const tetraminos = [
-  {
-    x: 0,
-    y: 5,
-    value: 2,
-    color: "cyan",
-    shape: [
-      [0, 0, 0, 0],
-      [1, 1, 1, 1],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-    ],
-  },
-  {
-    x: 0,
-    y: 5,
-    value: 2,
-    color: "blue",
-    shape: [
-      [1, 0, 0],
-      [1, 1, 1],
-      [0, 0, 0],
-    ],
-  },
-  {
-    x: 0,
-    y: 5,
-    value: 2,
-    color: "orange",
-    shape: [
-      [0, 0, 1],
-      [1, 1, 1],
-      [0, 0, 0],
-    ],
-  },
-  {
-    x: 0,
-    y: 5,
-    value: 2,
-    color: "yellow",
-    shape: [
-      [0, 1, 1, 0],
-      [0, 1, 1, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-    ],
-  },
-  {
-    x: 0,
-    y: 5,
-    value: 2,
-    color: "green",
-    shape: [
-      [0, 1, 1],
-      [1, 1, 0],
-      [0, 0, 0],
-    ],
-  },
-  {
-    x: 0,
-    y: 5,
-    value: 2,
-    color: "purple",
-    shape: [
-      [0, 1, 0],
-      [1, 1, 1],
-      [0, 0, 0],
-    ],
-  },
-  {
-    x: 0,
-    y: 5,
-    value: 2,
-    color: "red",
-    shape: [
-      [1, 1, 0],
-      [0, 1, 1],
-      [0, 0, 0],
-    ],
-  },
-];
+import { socket } from "src/hooks/useSocket";
 
 const Home: React.FC = () => {
   const [tetra, setTetra] = useState<Tetraminos>();
@@ -180,17 +99,18 @@ const Home: React.FC = () => {
     if (newMerge[1].find((cell) => cell.value === 3)) {
       setGameStatus("Game Over");
     } else {
+      socket.emit("endTetra", tetra);
       setTetra(undefined);
     }
   };
   useEffect(() => {
     if (tetra === undefined) {
-      const falseTetra = tetraminos[
-        Math.floor(Math.random() * (6 - 0)) + 0
-      ] as Tetraminos;
-      setTetra(falseTetra);
+      socket.emit("endTetra", tetra);
     }
-  });
+    socket.on("newTetra", (tetra: Tetraminos) => {
+      setTetra(tetra);
+    });
+  }, []);
   const tick = () => {
     if (gameStatus !== "Game Over") {
       if (tetra && tetra.value === 2) {

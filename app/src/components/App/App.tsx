@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
 import { message } from "antd";
 
@@ -11,6 +11,7 @@ import {
 import Routes from "./App.route";
 
 import styles from "./App.module.css";
+import { socket } from "src/hooks/useSocket";
 
 const { Content, Header } = Layout;
 
