@@ -11,7 +11,7 @@ import { socket } from "src/hooks/useSocket";
 const Home: React.FC = () => {
   const [tetra, setTetra] = useState<Tetraminos>();
   const [merge, setMerge] = useState<Cell[][]>();
-  const [gameStatus, setGameStatus] = useState<string>("Playing");
+  const [gameStatus, setGameStatus] = useState<string>("Waiting");
   // value: 0 => Empty
   // value: 1 => Block
   // value: 2 => Moving tetra
@@ -104,15 +104,15 @@ const Home: React.FC = () => {
     }
   };
   useEffect(() => {
-    if (tetra === undefined) {
-      socket.emit("endTetra", tetra);
-    }
     socket.on("newTetra", (tetra: Tetraminos) => {
+      if (gameStatus === "Waiting") {
+        setGameStatus("Playing");
+      }
       setTetra(tetra);
     });
   }, []);
   const tick = () => {
-    if (gameStatus !== "Game Over") {
+    if (gameStatus === "Playing") {
       if (tetra && tetra.value === 2) {
         const oldTetra = { ...tetra };
         oldTetra.x = oldTetra.x + 1;

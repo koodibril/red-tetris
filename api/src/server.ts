@@ -54,6 +54,7 @@ export function getSocketIo() {
 const onConnection = (socket: Socket) => {
   info("New client connected with id : " + socket.id);
   socket.emit("connection", null);
+  socket.emit("room", "#" + [...socket.rooms][0]);
   sockets(io, socket);
 };
 const onDisconnect = (socket: Socket) => {

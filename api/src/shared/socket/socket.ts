@@ -3,18 +3,6 @@ import { SocketData } from "./socket.d";
 import { tetraminos } from "./tetraminos";
 
 export const sockets = (io: Server, socket: Socket) => {
-  const update = function (payload: SocketData) {
-    console.log(payload);
-    console.log("user updated");
-  };
-  const disconnect = function (reason: string) {
-    console.log(reason);
-    console.log("user disconnected");
-  };
-  const logout = function (payload: SocketData) {
-    console.log(payload);
-    console.log("user logged out");
-  };
   const newTetra = (payload: SocketData) => {
     console.log(payload);
     console.log("sending new tetraminos");
@@ -24,9 +12,12 @@ export const sockets = (io: Server, socket: Socket) => {
       // tetraminos[0]
     );
   };
-  socket.on("order:update", update);
+  const joinRoom = (payload: string) => {
+    socket.join(payload);
+    console.log(io.sockets.adapter.rooms.get(payload));
+  };
   socket.on("order:newTetra", newTetra);
+  socket.on("order:join", joinRoom);
   socket.on("endTetra", newTetra);
-  socket.on("disconnect", disconnect);
-  socket.on("logout", logout);
+  socket.on("start", newTetra);
 };

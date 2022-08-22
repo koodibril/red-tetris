@@ -7,7 +7,6 @@ import App from "./components/App/App";
 const AppRoute: React.FC = () => (
   <Routes>
     <Route path="*" element={<App />}></Route>
-    <Route path="/" element={<App />}></Route>
   </Routes>
 );
 

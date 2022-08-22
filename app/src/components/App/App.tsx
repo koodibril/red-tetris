@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { message } from "antd";
 
@@ -12,12 +12,14 @@ import Routes from "./App.route";
 
 import styles from "./App.module.css";
 import { socket } from "src/hooks/useSocket";
+import { useNavigation } from "src/ducks/navigation/navigation";
 
 const { Content, Header } = Layout;
 
 const App: React.FC = () => {
   const messageState = useMessage();
   const { clearMessage } = useMessageActions();
+  const { pushState } = useNavigation();
 
   useMemo(() => {
     if (messageState.status === "error") {
@@ -29,6 +31,18 @@ const App: React.FC = () => {
     }
     clearMessage();
   }, [message, messageState]);
+
+  useEffect(() => {
+    const room = window.location.href.split("/")[3].split("[")[0];
+    if (room) {
+      socket.emit("order:join", room);
+    } else {
+      socket.on("room", (roomId: number) => {
+        const user = localStorage.getItem("username");
+        pushState("/" + roomId + "[" + (user ? user : "Unknown") + "]");
+      });
+    }
+  }, []);
 
   return (
     <Layout>
