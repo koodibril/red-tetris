@@ -17,7 +17,6 @@ export const sockets = (io: Server, socket: Socket) => {
     const player = room?.getPlayer(socket.id);
     if (player) player.setTetra(player.getTetra() + 1);
     socket.emit("newTetra", newTetra.getTetraminos());
-    console.log(rooms);
   };
   const endTetra = (payload: SocketData) => {
     const room = rooms.find((el) => el.getRoomName() === payload.room);
@@ -40,8 +39,18 @@ export const sockets = (io: Server, socket: Socket) => {
       );
     }
   };
-  const newLine = (payload: number) => {
-    console.log(payload);
+  const newLine = () => {
+    const room = rooms.find((room) => room.getPlayer(socket.id));
+    console.log(
+      `${room?.getPlayer(socket.id)?.getName()} completed one line !`
+    );
+    if (room) {
+      io.to(room.getRoomName()).emit(
+        "info",
+        `Player ${room.getPlayer(socket.id)?.getName()} gift everyone a malus !`
+      );
+      socket.broadcast.to(room.getRoomName()).emit("newline");
+    }
   };
   const startGame = (payload: SocketData) => {
     console.log(`Adding first tetraminos in room ${payload.room}`);
@@ -58,12 +67,12 @@ export const sockets = (io: Server, socket: Socket) => {
     if (room && room.getStatus() === "Playing") {
       room.getPlayer(socket.id)?.setStatus("GameOver");
       const winner = room.checkWinner();
-      console.log(winner);
       if (winner) {
         io.to(room.getRoomName()).emit(
           "info",
           `Player ${winner.getName()} win the game !`
         );
+        room.setStatus("Waiting");
         socket.to(winner.getId()).emit("winner");
       }
       io.to(room.getRoomName()).emit(
@@ -85,6 +94,16 @@ export const sockets = (io: Server, socket: Socket) => {
         "info",
         `Player ${payload.name} join the game !`
       );
+      const players = room.getPlayers();
+      const sockets = io.sockets.adapter.rooms.get(room.getRoomName());
+      if (sockets) {
+        players.forEach((player) => {
+          const id = player.getId();
+          if (!sockets.has(id)) {
+            room.removePlayer(player);
+          }
+        });
+      }
       room.addPlayer(new Player(socket.id, payload.name));
     } else {
       console.log(
@@ -94,6 +113,7 @@ export const sockets = (io: Server, socket: Socket) => {
     }
   };
   const leaveRoom = () => {
+    console.log(`Player leave the room`);
     rooms.forEach((room) => {
       const player = room.getPlayer(socket.id);
       if (player) {

@@ -30,7 +30,7 @@ const Score: React.FC<{ gameStatus: string }> = (props) => {
       newInfo.push(payload);
       setInfo(newInfo);
     });
-  }, []);
+  }, [info]);
   return (
     <>
       <Row justify="space-between">

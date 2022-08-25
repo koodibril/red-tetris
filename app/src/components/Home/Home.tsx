@@ -9,14 +9,6 @@ import { Col, Row } from "antd";
 import { socket } from "src/hooks/useSocket";
 
 const Home: React.FC = () => {
-  const [tetra, setTetra] = useState<Tetraminos>();
-  const [merge, setMerge] = useState<Cell[][]>();
-  const [gameStatus, setGameStatus] = useState<string>("Waiting");
-  // value: 0 => Empty
-  // value: 1 => Block
-  // value: 2 => Moving tetra
-  // value: 3 => Played tetra
-
   const generateGrid = () => {
     const grid: Cell[][] = [];
     for (let i = 0; i < 22; i++) {
@@ -32,6 +24,15 @@ const Home: React.FC = () => {
     }
     return grid;
   };
+  const [tetra, setTetra] = useState<Tetraminos>();
+  const [merge, setMerge] = useState<Cell[][]>(generateGrid());
+  const [malus, setMalus] = useState(false);
+  const [gameStatus, setGameStatus] = useState<string>("Waiting");
+  // value: 0 => Empty
+  // value: 1 => Block
+  // value: 2 => Moving tetra
+  // value: 3 => Played tetra
+
   const grid = useMemo(() => {
     const grid: Cell[][] = generateGrid();
     if (merge) {
@@ -46,6 +47,7 @@ const Home: React.FC = () => {
         row.map((cell: number, cIndex: number) => {
           if (cell === 1) {
             grid[tetra.x + rIndex][tetra.y + cIndex].color = tetra.color;
+            grid[tetra.x + rIndex][tetra.y + cIndex].value = 2;
           }
         });
       });
@@ -78,10 +80,17 @@ const Home: React.FC = () => {
       });
     });
     newMerge.map((row, index) => {
+      let blocks = 0;
+      row.forEach((cell) => {
+        if (cell.value === 1) {
+          blocks++;
+        }
+      });
       if (
-        !row.find((cell) => cell.value === 0) &&
-        index !== 0 &&
-        index !== 21
+        !row.find(
+          (cell, index) => cell.value === 0 && index !== 0 && index !== 11
+        ) &&
+        blocks !== 12
       ) {
         const newLine = [];
         for (let j = 0; j < 12; j++) {
@@ -93,6 +102,7 @@ const Home: React.FC = () => {
         }
         newMerge.splice(index, 1);
         newMerge.splice(1, 0, newLine);
+        socket.emit("order:newLine");
       }
     });
     setMerge(newMerge);
@@ -122,7 +132,21 @@ const Home: React.FC = () => {
     socket.on("winner", () => {
       setGameStatus("Winner");
     });
-  }, []);
+    socket.on("newline", () => {
+      const newLine = [];
+      for (let j = 0; j < 12; j++) {
+        newLine.push({ value: 1, color: "grey" });
+      }
+      merge.push(newLine);
+      merge.splice(1, 1);
+      setMerge(merge);
+    });
+    return () => {
+      socket.off("newTetra");
+      socket.off("winner");
+      socket.off("newline");
+    };
+  }, [merge]);
   const tick = () => {
     if (gameStatus === "Playing") {
       if (tetra && tetra.value === 2) {

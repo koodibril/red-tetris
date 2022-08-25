@@ -36,6 +36,9 @@ export class Game {
   getPlayer(id: string) {
     return this._players.find((player) => player.getId() === id);
   }
+  getPlayers() {
+    return this._players;
+  }
   setPlayer(newPlayer: Player) {
     this._players = this._players.map((player) => {
       if (player.getId() === newPlayer.getId()) return newPlayer;
@@ -64,12 +67,10 @@ export class Game {
   checkWinner() {
     let count = 0;
     this._players.forEach((player) => {
-      console.log(player.getStatus());
       if (player.getStatus() === "Playing") {
         count++;
       }
     });
-    console.log(count);
     if (count === 1) {
       return this._players.find((player) => player.getStatus() === "Playing");
     }

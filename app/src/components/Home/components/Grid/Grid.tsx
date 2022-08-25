@@ -17,7 +17,9 @@ const Grid: React.FC<{
                   borderColor: cas.color,
                 }}
                 key={cIndex}
-              ></div>
+              >
+                {cas.value}
+              </div>
             );
             return cell;
           })}
