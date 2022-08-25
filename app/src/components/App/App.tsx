@@ -35,7 +35,11 @@ const App: React.FC = () => {
   useEffect(() => {
     const room = window.location.href.split("/")[3].split("[")[0];
     if (room) {
-      socket.emit("order:join", room);
+      socket.emit("order:join", {
+        room: window.location.href.split("/")[3].split("[")[0].slice(1),
+        name: window.location.href.split("/")[3].split("[")[1].slice(0, -1),
+        tetraminos: undefined,
+      });
     } else {
       socket.on("room", (roomId: number) => {
         const user = localStorage.getItem("username");

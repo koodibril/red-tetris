@@ -98,8 +98,17 @@ const Home: React.FC = () => {
     setMerge(newMerge);
     if (newMerge[1].find((cell) => cell.value === 3)) {
       setGameStatus("Game Over");
+      socket.emit("order:gameover", {
+        room: window.location.href.split("/")[3].split("[")[0].slice(1),
+        name: window.location.href.split("/")[3].split("[")[1].slice(0, -1),
+        tetraminos: tetra,
+      });
     } else {
-      socket.emit("endTetra", tetra);
+      socket.emit("endTetra", {
+        room: window.location.href.split("/")[3].split("[")[0].slice(1),
+        name: window.location.href.split("/")[3].split("[")[1].slice(0, -1),
+        tetraminos: tetra,
+      });
       setTetra(undefined);
     }
   };
@@ -109,6 +118,9 @@ const Home: React.FC = () => {
         setGameStatus("Playing");
       }
       setTetra(tetra);
+    });
+    socket.on("winner", () => {
+      setGameStatus("Winner");
     });
   }, []);
   const tick = () => {

@@ -1,4 +1,7 @@
+import { Tetraminos } from "./Tetraminos.d";
+
 export interface SocketData {
+  room: string;
   name: string;
-  age: number;
+  tetraminos: Tetraminos | undefined;
 }

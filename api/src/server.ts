@@ -60,6 +60,7 @@ const onConnection = (socket: Socket) => {
 const onDisconnect = (socket: Socket) => {
   info("Client Disocnnected with id : " + socket.id);
   socket.emit("disconnect", null);
+  sockets(io, socket);
 };
 io.on("connection", onConnection);
 io.on("disconnect", onDisconnect);

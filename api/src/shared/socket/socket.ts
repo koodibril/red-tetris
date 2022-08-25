@@ -1,23 +1,116 @@
 import { Server, Socket } from "socket.io";
+import { Game } from "../classes/Game";
+import { Piece } from "../classes/Piece";
+import { Player } from "../classes/Player";
 import { SocketData } from "./socket.d";
-import { tetraminos } from "./tetraminos";
+
+const rooms = <Game[]>[];
 
 export const sockets = (io: Server, socket: Socket) => {
   const newTetra = (payload: SocketData) => {
-    console.log(payload);
-    console.log("sending new tetraminos");
-    socket.emit(
-      "newTetra",
-      tetraminos[Math.floor(Math.random() * (6 - 0)) + 0]
-      // tetraminos[0]
+    console.log(
+      `Adding new tetraminos for player ${payload.name} in room ${payload.room}`
     );
+    const newTetra = new Piece();
+    const room = rooms.find((el) => el.getRoomName() === payload.room);
+    room?.setTetraminos(newTetra);
+    const player = room?.getPlayer(socket.id);
+    if (player) player.setTetra(player.getTetra() + 1);
+    socket.emit("newTetra", newTetra.getTetraminos());
+    console.log(rooms);
   };
-  const joinRoom = (payload: string) => {
-    socket.join(payload);
-    console.log(io.sockets.adapter.rooms.get(payload));
+  const endTetra = (payload: SocketData) => {
+    const room = rooms.find((el) => el.getRoomName() === payload.room);
+    const player = room?.getPlayer(socket.id);
+    if (
+      player &&
+      room &&
+      player.getTetra() === room.getTetraminos().length - 1
+    ) {
+      console.log(
+        `Player ${payload.name} is first in line ! Creating new tetra for him`
+      );
+      newTetra(payload);
+    } else if (player && room) {
+      console.log(`Player ${payload.name} advance on next tetra`);
+      player.setTetra(player.getTetra() + 1);
+      socket.emit(
+        "newTetra",
+        room.getTetraminos()[player.getTetra()].getTetraminos()
+      );
+    }
   };
+  const newLine = (payload: number) => {
+    console.log(payload);
+  };
+  const startGame = (payload: SocketData) => {
+    console.log(`Adding first tetraminos in room ${payload.room}`);
+    const newTetra = new Piece();
+    const room = rooms.find((el) => el.getRoomName() === payload.room);
+    if (room) {
+      room.setStatus("Playing");
+      room.setTetraminos(newTetra);
+      io.to(room.getRoomName()).emit("newTetra", newTetra.getTetraminos());
+    }
+  };
+  const gameOver = (payload: SocketData) => {
+    const room = rooms.find((el) => el.getRoomName() === payload.room);
+    if (room && room.getStatus() === "Playing") {
+      room.getPlayer(socket.id)?.setStatus("GameOver");
+      const winner = room.checkWinner();
+      console.log(winner);
+      if (winner) {
+        io.to(room.getRoomName()).emit(
+          "info",
+          `Player ${winner.getName()} win the game !`
+        );
+        socket.to(winner.getId()).emit("winner");
+      }
+      io.to(room.getRoomName()).emit(
+        "info",
+        `Player ${payload.name} loose the game !`
+      );
+    }
+  };
+  const joinRoom = (payload: SocketData) => {
+    socket.join(payload.room);
+    const room = rooms.find((el) => el.getRoomName() === payload.room);
+    if (room) {
+      console.log(
+        `Adding player ${payload.name} as ${
+          socket.id
+        } in room ${room.getRoomName()}`
+      );
+      io.to(room.getRoomName()).emit(
+        "info",
+        `Player ${payload.name} join the game !`
+      );
+      room.addPlayer(new Player(socket.id, payload.name));
+    } else {
+      console.log(
+        `Creating new room for player ${payload.name} => ${payload.room}`
+      );
+      rooms.push(new Game(payload.room, socket.id, payload.name));
+    }
+  };
+  const leaveRoom = () => {
+    rooms.forEach((room) => {
+      const player = room.getPlayer(socket.id);
+      if (player) {
+        gameOver({
+          name: player.getName(),
+          room: room.getRoomName(),
+          tetraminos: undefined,
+        });
+      }
+    });
+  };
+
   socket.on("order:newTetra", newTetra);
   socket.on("order:join", joinRoom);
-  socket.on("endTetra", newTetra);
-  socket.on("start", newTetra);
+  socket.on("order:newLine", newLine);
+  socket.on("order:start", startGame);
+  socket.on("order:gameover", gameOver);
+  socket.on("endTetra", endTetra);
+  socket.on("disconnect", leaveRoom);
 };
