@@ -35,6 +35,10 @@ const App: React.FC = () => {
   }, [message, messageState]);
 
   useEffect(() => {
+    const user = window.location.href.split("/")[3].split("[")[1];
+    if (user) {
+      pushState("/" + window.location.href.split("/")[3].split("[")[0]);
+    }
     socket.on("connect", () => {
       const room = window.location.href.split("/")[3].split("[")[0];
       if (!room) {
