@@ -13,6 +13,7 @@ import Routes from "./App.route";
 import styles from "./App.module.css";
 import { socket } from "src/hooks/useSocket";
 import { useNavigation } from "src/ducks/navigation/navigation";
+import UserComponent from "../Home/components/Score/Username";
 
 const { Content, Header } = Layout;
 
@@ -20,6 +21,7 @@ const App: React.FC = () => {
   const messageState = useMessage();
   const { clearMessage } = useMessageActions();
   const { pushState } = useNavigation();
+  const [modal, setModal] = useState(true);
 
   useMemo(() => {
     if (messageState.status === "error") {
@@ -35,16 +37,9 @@ const App: React.FC = () => {
   useEffect(() => {
     socket.on("connect", () => {
       const room = window.location.href.split("/")[3].split("[")[0];
-      if (room) {
-        socket.emit("order:join", {
-          room: window.location.href.split("/")[3].split("[")[0].slice(1),
-          name: window.location.href.split("/")[3].split("[")[1].slice(0, -1),
-          tetraminos: undefined,
-        });
-      } else {
+      if (!room) {
         socket.on("room", (roomId: number) => {
-          const user = localStorage.getItem("username");
-          pushState("/" + roomId + "[" + (user ? user : "Unknown") + "]");
+          pushState("/" + roomId);
         });
       }
     });
@@ -58,6 +53,7 @@ const App: React.FC = () => {
         </Typography.Title>
       </Header>
       <Content className={styles.content}>
+        <UserComponent visible={modal} setVisible={setModal}></UserComponent>
         <Routes />
       </Content>
     </Layout>

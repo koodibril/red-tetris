@@ -79,4 +79,8 @@ export class Game {
     }
     return false;
   }
+
+  getAdmin() {
+    return this._admin;
+  }
 }

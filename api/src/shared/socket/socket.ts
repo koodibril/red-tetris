@@ -74,6 +74,7 @@ export const sockets = (io: Server, socket: Socket) => {
         );
         room.setStatus("Waiting");
         room.resetTetraminos();
+        socket.to(room.getAdmin().getId()).emit("admin");
         socket.to(winner.getId()).emit("winner");
       }
       io.to(room.getRoomName()).emit(
@@ -106,13 +107,15 @@ export const sockets = (io: Server, socket: Socket) => {
           }
         });
       }
+      console.log(room.getAdmin().getId());
+      socket.to(room.getAdmin().getId()).emit("admin");
     } else {
       console.log(
         `Creating new room for player ${payload.name} => ${payload.room}`
       );
       rooms.push(new Game(payload.room, socket.id, payload.name));
+      socket.emit("admin");
     }
-    // console.log(rooms[0].getPlayers());
   };
   const leaveRoom = () => {
     console.log(`Player leave the room`);
@@ -124,7 +127,9 @@ export const sockets = (io: Server, socket: Socket) => {
           room: room.getRoomName(),
           tetraminos: undefined,
         });
+        room.removePlayer(player);
       }
+      socket.to(room.getAdmin().getId()).emit("admin");
     });
   };
 
