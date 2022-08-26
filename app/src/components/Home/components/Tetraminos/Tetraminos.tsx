@@ -24,7 +24,8 @@ const Actions: React.FC<{
           tetra.x + rIndex !== 0 &&
           props.grid &&
           props.grid[tetra.x + rIndex][tetra.y + cIndex].value !== 0 &&
-          props.grid[tetra.x + rIndex][tetra.y + cIndex].value !== 2
+          props.grid[tetra.x + rIndex][tetra.y + cIndex].value !== 2 &&
+          props.grid[tetra.x + rIndex][tetra.y + cIndex].value !== 4
         ) {
           touch = true;
         }

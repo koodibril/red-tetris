@@ -31,7 +31,34 @@ const Home: React.FC = () => {
   // value: 1 => Block
   // value: 2 => Moving tetra
   // value: 3 => Played tetra
+  // value: 4 => Shadow
 
+  const checkMerge = (tetra: Tetraminos, grid: Cell[][]) => {
+    let touch = false;
+    tetra.shape.map((row: number[], rIndex: number) => {
+      row.map((cell: number, cIndex: number) => {
+        if (
+          cell === 1 &&
+          tetra.x + rIndex !== 0 &&
+          grid &&
+          grid[tetra.x + rIndex][tetra.y + cIndex].value !== 0 &&
+          grid[tetra.x + rIndex][tetra.y + cIndex].value !== 2 &&
+          grid[tetra.x + rIndex][tetra.y + cIndex].value !== 4
+        ) {
+          touch = true;
+        }
+      });
+    });
+    return touch;
+  };
+  const createShadow = (tetra: Tetraminos, grid: Cell[][]) => {
+    const newTetra = { ...tetra };
+    while (!checkMerge(newTetra, grid)) {
+      newTetra.x = newTetra.x + 1;
+    }
+    newTetra.x = newTetra.x - 1;
+    return newTetra;
+  };
   const grid = useMemo(() => {
     const grid: Cell[][] = generateGrid();
     if (merge) {
@@ -42,9 +69,16 @@ const Home: React.FC = () => {
       }
     }
     if (tetra) {
+      const shadow = createShadow(tetra, grid);
       tetra.shape.map((row: number[], rIndex: number) => {
         row.map((cell: number, cIndex: number) => {
-          if (cell === 1) {
+          if (
+            cell === 1 &&
+            grid[shadow.x + rIndex][shadow.y + cIndex] &&
+            grid[tetra.x + rIndex][tetra.y + cIndex]
+          ) {
+            grid[shadow.x + rIndex][shadow.y + cIndex].color = tetra.color;
+            grid[shadow.x + rIndex][shadow.y + cIndex].value = 4;
             grid[tetra.x + rIndex][tetra.y + cIndex].color = tetra.color;
             grid[tetra.x + rIndex][tetra.y + cIndex].value = 2;
           }
@@ -53,22 +87,6 @@ const Home: React.FC = () => {
     }
     return grid;
   }, [tetra, merge]);
-  const checkMerge = (tetra: Tetraminos) => {
-    let touch = false;
-    tetra.shape.map((row: number[], rIndex: number) => {
-      row.map((cell: number, cIndex: number) => {
-        if (
-          cell === 1 &&
-          grid &&
-          grid[tetra.x + rIndex][tetra.y + cIndex].value !== 0 &&
-          grid[tetra.x + rIndex][tetra.y + cIndex].value !== 2
-        ) {
-          touch = true;
-        }
-      });
-    });
-    return touch;
-  };
   const mergeBoard = (tetra: Tetraminos) => {
     const newMerge = grid;
     tetra.shape.map((row: number[], rIndex: number) => {
@@ -110,13 +128,13 @@ const Home: React.FC = () => {
     if (newMerge[1].find((cell) => cell.value === 3)) {
       setGameStatus("Game Over");
       socket.emit("order:gameover", {
-        room: window.location.href.split("/")[3].split("[")[0].slice(1),
+        room: window.location.href.split("/")[3].split("[")[0],
         name: window.location.href.split("/")[3].split("[")[1].slice(0, -1),
         tetraminos: tetra,
       });
     } else {
       socket.emit("endTetra", {
-        room: window.location.href.split("/")[3].split("[")[0].slice(1),
+        room: window.location.href.split("/")[3].split("[")[0],
         name: window.location.href.split("/")[3].split("[")[1].slice(0, -1),
         tetraminos: tetra,
       });
@@ -155,7 +173,7 @@ const Home: React.FC = () => {
       if (tetra && tetra.value === 2) {
         const oldTetra = { ...tetra };
         oldTetra.x = oldTetra.x + 1;
-        if (checkMerge(oldTetra)) {
+        if (checkMerge(oldTetra, grid)) {
           oldTetra.value = 2;
           oldTetra.x = oldTetra.x - 1;
           mergeBoard(oldTetra);
@@ -167,21 +185,23 @@ const Home: React.FC = () => {
   };
   useInterval(tick, 600);
   return (
-    <Row>
-      <Col span={8} offset={4}>
-        <GridComponent grid={grid}></GridComponent>
-        {tetra ? (
-          <ActionsComponent
-            tetra={tetra}
-            control={setTetra}
-            grid={grid}
-            gameStatus={gameStatus}
-          ></ActionsComponent>
-        ) : null}
+    <Row justify="space-around">
+      <Col span={4}></Col>
+      <Col span={12}>
+        <Row>
+          <GridComponent grid={grid}></GridComponent>
+          {tetra ? (
+            <ActionsComponent
+              tetra={tetra}
+              control={setTetra}
+              grid={grid}
+              gameStatus={gameStatus}
+            ></ActionsComponent>
+          ) : null}
+          <ScoreComponent gameStatus={gameStatus}></ScoreComponent>
+        </Row>
       </Col>
-      <Col span={8} offset={4}>
-        <ScoreComponent gameStatus={gameStatus}></ScoreComponent>
-      </Col>
+      <Col span={4}></Col>
     </Row>
   );
 };

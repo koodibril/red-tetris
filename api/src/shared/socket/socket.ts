@@ -7,36 +7,33 @@ import { SocketData } from "./socket.d";
 const rooms = <Game[]>[];
 
 export const sockets = (io: Server, socket: Socket) => {
-  const newTetra = (payload: SocketData) => {
-    console.log(
-      `Adding new tetraminos for player ${payload.name} in room ${payload.room}`
-    );
-    const newTetra = new Piece();
-    const room = rooms.find((el) => el.getRoomName() === payload.room);
-    room?.setTetraminos(newTetra);
-    const player = room?.getPlayer(socket.id);
-    if (player) player.setTetra(player.getTetra() + 1);
-    socket.emit("newTetra", newTetra.getTetraminos());
-  };
   const endTetra = (payload: SocketData) => {
     const room = rooms.find((el) => el.getRoomName() === payload.room);
     const player = room?.getPlayer(socket.id);
+    console.log(player?.getTetra(), room?.getTetraminos().length);
     if (
       player &&
       room &&
-      player.getTetra() === room.getTetraminos().length - 1
+      player.getTetra() === room.getTetraminos().length - 5
     ) {
-      console.log(
-        `Player ${payload.name} is first in line ! Creating new tetra for him`
-      );
-      newTetra(payload);
-    } else if (player && room) {
+      console.log(`Server is falling back, adding tetra`);
+      const newTetra = new Piece();
+      room.setTetraminos(newTetra);
+    }
+    if (player && room) {
       console.log(`Player ${payload.name} advance on next tetra`);
       player.setTetra(player.getTetra() + 1);
       socket.emit(
         "newTetra",
         room.getTetraminos()[player.getTetra()].getTetraminos()
       );
+      const nextTetra = [];
+      for (let i = 1; i < 5; i++) {
+        nextTetra.push(
+          room.getTetraminos()[player.getTetra() + i].getTetraminos()
+        );
+      }
+      socket.emit("nextTetra", nextTetra);
     }
   };
   const newLine = (lines: number) => {
@@ -53,12 +50,19 @@ export const sockets = (io: Server, socket: Socket) => {
     }
   };
   const startGame = (payload: SocketData) => {
-    console.log(`Adding first tetraminos in room ${payload.room}`);
+    console.log(`Adding 5 tetraminos in room ${payload.room}`);
     const newTetra = new Piece();
     const room = rooms.find((el) => el.getRoomName() === payload.room);
     if (room) {
-      room.setStatus("Playing");
       room.setTetraminos(newTetra);
+      const nextTetra = [];
+      for (let i = 0; i < 4; i++) {
+        const tetra = new Piece();
+        room.setTetraminos(tetra);
+        nextTetra.push(tetra.getTetraminos());
+      }
+      io.to(room.getRoomName()).emit("nextTetra", nextTetra);
+      room.setStatus("Playing");
       io.to(room.getRoomName()).emit("newTetra", newTetra.getTetraminos());
     }
   };
@@ -107,7 +111,7 @@ export const sockets = (io: Server, socket: Socket) => {
           }
         });
       }
-      console.log(room.getAdmin().getId());
+      console.log(room.getPlayers());
       socket.to(room.getAdmin().getId()).emit("admin");
     } else {
       console.log(
@@ -119,21 +123,25 @@ export const sockets = (io: Server, socket: Socket) => {
   };
   const leaveRoom = () => {
     console.log(`Player leave the room`);
-    rooms.forEach((room) => {
+    rooms.forEach((room, index) => {
       const player = room.getPlayer(socket.id);
       if (player) {
-        gameOver({
-          name: player.getName(),
-          room: room.getRoomName(),
-          tetraminos: undefined,
-        });
-        room.removePlayer(player);
+        if (room.getPlayers().length === 1) {
+          delete rooms[index];
+          rooms.splice(index, 1);
+        } else {
+          gameOver({
+            name: player.getName(),
+            room: room.getRoomName(),
+            tetraminos: undefined,
+          });
+          room.removePlayer(player);
+          socket.to(room.getAdmin().getId()).emit("admin");
+        }
       }
-      socket.to(room.getAdmin().getId()).emit("admin");
     });
   };
 
-  socket.on("order:newTetra", newTetra);
   socket.on("order:join", joinRoom);
   socket.on("order:newLine", newLine);
   socket.on("order:start", startGame);

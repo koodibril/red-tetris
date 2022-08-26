@@ -14,6 +14,7 @@ export class Game {
     this._tetraminos = [];
     this._players = [new Player(id, name)];
     this._admin = this._players[0];
+    console.log(`${this._admin.getId()} is the new Admin !`);
   }
 
   getStatus() {
@@ -60,6 +61,7 @@ export class Game {
     );
     if (oldPlayer.getId() === this._admin.getId()) {
       this._admin = this._players[0];
+      if (this._admin) console.log(`${this._admin.getId()} is the new Admin !`);
     }
     return true;
   }
