@@ -26,7 +26,6 @@ const Home: React.FC = () => {
   };
   const [tetra, setTetra] = useState<Tetraminos>();
   const [merge, setMerge] = useState<Cell[][]>(generateGrid());
-  const [malus, setMalus] = useState(false);
   const [gameStatus, setGameStatus] = useState<string>("Waiting");
   // value: 0 => Empty
   // value: 1 => Block
@@ -79,6 +78,7 @@ const Home: React.FC = () => {
         }
       });
     });
+    let lines = 0;
     newMerge.map((row, index) => {
       let blocks = 0;
       row.forEach((cell) => {
@@ -100,11 +100,12 @@ const Home: React.FC = () => {
             newLine.push({ value: 0, color: "lightgrey" });
           }
         }
+        lines++;
         newMerge.splice(index, 1);
         newMerge.splice(1, 0, newLine);
-        socket.emit("order:newLine");
       }
     });
+    if (lines > 1) socket.emit("order:newLine", lines - 1);
     setMerge(newMerge);
     if (newMerge[1].find((cell) => cell.value === 3)) {
       setGameStatus("Game Over");
@@ -132,14 +133,16 @@ const Home: React.FC = () => {
     socket.on("winner", () => {
       setGameStatus("Winner");
     });
-    socket.on("newline", () => {
-      const newLine = [];
-      for (let j = 0; j < 12; j++) {
-        newLine.push({ value: 1, color: "grey" });
+    socket.on("newline", (lines: number) => {
+      for (let i = 0; i < lines; i++) {
+        const newLine = [];
+        for (let j = 0; j < 12; j++) {
+          newLine.push({ value: 1, color: "grey" });
+        }
+        merge.push(newLine);
+        merge.splice(1, 1);
+        setMerge(merge);
       }
-      merge.push(newLine);
-      merge.splice(1, 1);
-      setMerge(merge);
     });
     return () => {
       socket.off("newTetra");

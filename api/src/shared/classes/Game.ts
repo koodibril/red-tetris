@@ -32,6 +32,9 @@ export class Game {
   setTetraminos(tetra: Piece) {
     this._tetraminos.push(tetra);
   }
+  resetTetraminos() {
+    this._tetraminos = [];
+  }
 
   getPlayer(id: string) {
     return this._players.find((player) => player.getId() === id);
@@ -53,7 +56,7 @@ export class Game {
       return false;
     }
     this._players = this._players.filter(
-      (player) => player.getId() === oldPlayer.getId()
+      (player) => player.getId() !== oldPlayer.getId()
     );
     if (oldPlayer.getId() === this._admin.getId()) {
       this._admin = this._players[0];

@@ -39,7 +39,7 @@ export const sockets = (io: Server, socket: Socket) => {
       );
     }
   };
-  const newLine = () => {
+  const newLine = (lines: number) => {
     const room = rooms.find((room) => room.getPlayer(socket.id));
     console.log(
       `${room?.getPlayer(socket.id)?.getName()} completed one line !`
@@ -49,7 +49,7 @@ export const sockets = (io: Server, socket: Socket) => {
         "info",
         `Player ${room.getPlayer(socket.id)?.getName()} gift everyone a malus !`
       );
-      socket.broadcast.to(room.getRoomName()).emit("newline");
+      socket.broadcast.to(room.getRoomName()).emit("newline", lines);
     }
   };
   const startGame = (payload: SocketData) => {
@@ -73,6 +73,7 @@ export const sockets = (io: Server, socket: Socket) => {
           `Player ${winner.getName()} win the game !`
         );
         room.setStatus("Waiting");
+        room.resetTetraminos();
         socket.to(winner.getId()).emit("winner");
       }
       io.to(room.getRoomName()).emit(
@@ -94,6 +95,7 @@ export const sockets = (io: Server, socket: Socket) => {
         "info",
         `Player ${payload.name} join the game !`
       );
+      room.addPlayer(new Player(socket.id, payload.name));
       const players = room.getPlayers();
       const sockets = io.sockets.adapter.rooms.get(room.getRoomName());
       if (sockets) {
@@ -104,13 +106,13 @@ export const sockets = (io: Server, socket: Socket) => {
           }
         });
       }
-      room.addPlayer(new Player(socket.id, payload.name));
     } else {
       console.log(
         `Creating new room for player ${payload.name} => ${payload.room}`
       );
       rooms.push(new Game(payload.room, socket.id, payload.name));
     }
+    // console.log(rooms[0].getPlayers());
   };
   const leaveRoom = () => {
     console.log(`Player leave the room`);
