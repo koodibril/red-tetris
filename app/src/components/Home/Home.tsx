@@ -198,18 +198,32 @@ const Home: React.FC = () => {
   };
   useInterval(tick, 600);
   return (
-    <Row justify="space-around">
-      <Col span={4}>
-        <OponentsComponent></OponentsComponent>
+    <Row justify="space-between">
+      <Col span={6}>
+        <OponentsComponent side={false}></OponentsComponent>
       </Col>
-      <Col span={12}>
+      <Col
+        span={12}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <Row style={{ width: "600px" }}>
-          <GridComponent grid={grid}></GridComponent>
+          <GridComponent
+            grid={grid}
+            cellSize={"35px"}
+            borderSize={"10px"}
+            padding={"10%"}
+          ></GridComponent>
           {tetra ? <ActionsComponent grid={grid}></ActionsComponent> : null}
           <ScoreComponent></ScoreComponent>
         </Row>
       </Col>
-      <Col span={4}></Col>
+      <Col span={6}>
+        <OponentsComponent side={true}></OponentsComponent>
+      </Col>
     </Row>
   );
 };
