@@ -13,6 +13,9 @@ export interface TetrisState {
   merge: Cell[][] | undefined;
   room: string;
   name: string;
+  oponents:
+    | { status: TetrisState["gameStatus"]; shadow: Cell[][] }[]
+    | undefined;
 }
 
 const initialState: TetrisState = {
@@ -26,6 +29,7 @@ const initialState: TetrisState = {
   merge: undefined,
   room: "",
   name: "",
+  oponents: undefined,
 };
 
 export const tetrisSlice = createSlice({
@@ -83,6 +87,9 @@ export const tetrisSlice = createSlice({
     setMerge: (state, action: PayloadAction<TetrisState["merge"]>) => {
       state.merge = action.payload;
     },
+    setOponents: (state, action: PayloadAction<TetrisState["oponents"]>) => {
+      state.oponents = action.payload;
+    },
   },
 });
 
@@ -99,5 +106,6 @@ export const {
   setMerge,
   setRoom,
   setName,
+  setOponents,
 } = tetrisSlice.actions;
 export default tetrisSlice.reducer;

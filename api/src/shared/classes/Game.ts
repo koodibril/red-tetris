@@ -100,4 +100,15 @@ export class Game {
     });
     return position;
   }
+
+  getOponents() {
+    const oponents = this._players.map((player) => {
+      const oponent = {
+        status: player.getStatus(),
+        shadow: player.getShadow(),
+      };
+      return oponent;
+    });
+    return oponents;
+  }
 }

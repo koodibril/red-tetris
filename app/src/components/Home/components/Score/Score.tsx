@@ -5,21 +5,17 @@ import { socket } from "src/hooks/useSocket";
 import styles from "./Score.module.css";
 
 const Score: React.FC = () => {
-  const { info, admin, score, gameStatus, nextTetra, position } = useTetris();
+  const { info, admin, score, gameStatus, nextTetra, position, room, name } =
+    useTetris();
   const {
     listenToInfo,
     listenToAdmin,
     listenToNextTetra,
     listenToPosition,
-    setMerge,
+    start,
   } = useTetrisActions();
   const handleStart = () => {
-    setMerge(undefined);
-    socket.emit("order:start", {
-      room: window.location.href.split("/")[3].split("[")[0],
-      name: window.location.href.split("/")[3].split("[")[1].slice(0, -1),
-      tetraminos: undefined,
-    });
+    start(socket, room, name);
   };
   useEffect(() => {
     listenToInfo(socket);

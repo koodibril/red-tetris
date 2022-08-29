@@ -21,6 +21,9 @@ export const sockets = (io: Server, socket: Socket) => {
     }
     if (player && room) {
       console.log(`Player ${payload.name} advance on next tetra`);
+      if (payload.grid) {
+        player.setShadow(payload.grid);
+      }
       player.setTetra(player.getTetra() + 1);
       socket.emit(
         "newTetra",
@@ -32,6 +35,9 @@ export const sockets = (io: Server, socket: Socket) => {
           room.getTetraminos()[player.getTetra() + i].getTetraminos()
         );
       }
+      socket.broadcast
+        .to(room.getRoomName())
+        .emit("oponents", room.getOponents());
       socket.emit("nextTetra", nextTetra);
       socket.emit("position", room.getPosition(socket.id));
     }
@@ -114,7 +120,6 @@ export const sockets = (io: Server, socket: Socket) => {
           if (!sockets.has(id)) {
             room.removePlayer(player);
           } else {
-            console.log(id, room.getPosition(id));
             io.to(id).emit("position", room.getPosition(id));
           }
         });

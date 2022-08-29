@@ -15,10 +15,12 @@ import {
   setMerge,
   setRoom,
   setName,
+  setOponents,
 } from "src/ducks/tetris/tetrisSlice";
 import { Tetraminos } from "src/components/Home/components/Tetraminos/Tetraminos.d";
 import { Socket } from "socket.io-client";
 import { rotateCounterClockwise } from "src/utils/utils";
+import { Cell } from "src/components/Home/components/Grid/Grid.d";
 
 const listenToNewTetra = (socket: Socket) => (dispatch: AppDispatch) => {
   socket.on("newTetra", (tetra: Tetraminos) => {
@@ -39,13 +41,20 @@ const listenToMalus = (socket: Socket) => (dispatch: AppDispatch) => {
 };
 
 const gameOver =
-  (socket: Socket, room: string, name: string, tetra: Tetraminos) =>
+  (
+    socket: Socket,
+    room: string,
+    name: string,
+    tetra: Tetraminos,
+    grid: Cell[][]
+  ) =>
   (dispatch: AppDispatch) => {
     dispatch(setStatus("Game Over"));
     socket.emit("order:gameover", {
       room: room,
       name: name,
       tetraminos: tetra,
+      grid: grid,
     });
   };
 
@@ -73,12 +82,19 @@ const joinRoom =
   };
 
 const endTetra =
-  (socket: Socket, room: string, name: string, tetra: Tetraminos) =>
+  (
+    socket: Socket,
+    room: string,
+    name: string,
+    tetra: Tetraminos,
+    grid: Cell[][]
+  ) =>
   (dispatch: AppDispatch) => {
     socket.emit("endTetra", {
-      room: window.location.href.split("/")[3].split("[")[0],
-      name: window.location.href.split("/")[3].split("[")[1].slice(0, -1),
+      room: room,
+      name: name,
       tetraminos: tetra,
+      grid: grid,
     });
     dispatch(setTetra(undefined));
   };
@@ -111,6 +127,26 @@ const listenToPosition = (socket: Socket) => (dispatch: AppDispatch) => {
   });
 };
 
+const listenToOponents = (socket: Socket) => (dispatch: AppDispatch) => {
+  socket.on("oponents", (oponents: TetrisState["oponents"]) => {
+    dispatch(setOponents(oponents));
+  });
+};
+
+const addMalus = (socket: Socket, lines: number) => {
+  socket.emit("order:newLine", lines);
+};
+
+const start =
+  (socket: Socket, room: string, name: string) => (dispatch: AppDispatch) => {
+    dispatch(setMerge(undefined));
+    socket.emit("order:start", {
+      room: room,
+      name: name,
+      tetraminos: undefined,
+    });
+  };
+
 export const useTetris = () =>
   useAppSelector((state: RootState) => state.tetris);
 
@@ -140,8 +176,9 @@ export const useTetrisActions = () => {
         socket: Socket,
         room: string,
         name: string,
-        tetra: Tetraminos
-      ) => dispatch(gameOver(socket, room, name, tetra)),
+        tetra: Tetraminos,
+        grid: Cell[][]
+      ) => dispatch(gameOver(socket, room, name, tetra, grid)),
       listenToServer: (socket: Socket) => dispatch(listenToServer(socket)),
       joinRoom: (socket: Socket, room: string, name: string) =>
         dispatch(joinRoom(socket, room, name)),
@@ -149,13 +186,18 @@ export const useTetrisActions = () => {
         socket: Socket,
         room: string,
         name: string,
-        tetra: Tetraminos
-      ) => dispatch(endTetra(socket, room, name, tetra)),
+        tetra: Tetraminos,
+        grid: Cell[][]
+      ) => dispatch(endTetra(socket, room, name, tetra, grid)),
       listenToInfo: (socket: Socket) => dispatch(listenToInfo(socket)),
       listenToAdmin: (socket: Socket) => dispatch(listenToAdmin(socket)),
       listenToNextTetra: (socket: Socket) =>
         dispatch(listenToNextTetra(socket)),
       listenToPosition: (socket: Socket) => dispatch(listenToPosition(socket)),
+      listenToOponents: (socket: Socket) => dispatch(listenToOponents(socket)),
+      addMalus: (socket: Socket, lines: number) => addMalus(socket, lines),
+      start: (socket: Socket, room: string, name: string) =>
+        dispatch(start(socket, room, name)),
     }),
     [dispatch]
   );

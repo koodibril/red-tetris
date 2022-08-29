@@ -1,15 +1,19 @@
+import { Cell } from "../socket/Tetraminos";
+
 export class Player {
   private _id: string;
   private _tetra: number;
   private _status: string;
   private _name: string;
   private _score: number;
+  private _shadow: Cell[][] | undefined;
   constructor(id: string, name: string) {
     this._id = id;
     this._tetra = 0;
     this._status = "Waiting";
     this._name = name;
     this._score = 0;
+    this._shadow = undefined;
   }
 
   getId() {
@@ -52,5 +56,12 @@ export class Player {
         this._score += 1200;
         break;
     }
+  }
+
+  getShadow() {
+    return this._shadow;
+  }
+  setShadow(shadow: Cell[][]) {
+    this._shadow = shadow;
   }
 }

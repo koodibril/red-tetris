@@ -8,6 +8,7 @@ import { Cell } from "./components/Grid/Grid.d";
 import { Col, Row } from "antd";
 import { socket } from "src/hooks/useSocket";
 import { useTetris, useTetrisActions } from "src/ducks/tetris/actions/tetris";
+import OponentsComponent from "./components/Oponents/Oponents";
 
 const Home: React.FC = () => {
   const {
@@ -19,6 +20,7 @@ const Home: React.FC = () => {
     listenToMalus,
     gameOver,
     endTetra,
+    addMalus,
   } = useTetrisActions();
   const { tetra, gameStatus, score, merge, name, room } = useTetris();
   const generateGrid = () => {
@@ -161,12 +163,12 @@ const Home: React.FC = () => {
     });
     const lines = checkFullLines(newMerge);
     calcScore(lines);
-    if (lines > 0) socket.emit("order:newLine", lines);
+    if (lines > 0) addMalus(socket, lines);
     setMerge(newMerge);
     if (newMerge[1].find((cell) => cell.value === 3)) {
-      gameOver(socket, room, name, tetra);
+      gameOver(socket, room, name, tetra, newMerge);
     } else {
-      endTetra(socket, room, name, tetra);
+      endTetra(socket, room, name, tetra, newMerge);
     }
   };
   useEffect(() => {
@@ -197,7 +199,9 @@ const Home: React.FC = () => {
   useInterval(tick, 600);
   return (
     <Row justify="space-around">
-      <Col span={4}></Col>
+      <Col span={4}>
+        <OponentsComponent></OponentsComponent>
+      </Col>
       <Col span={12}>
         <Row style={{ width: "600px" }}>
           <GridComponent grid={grid}></GridComponent>
