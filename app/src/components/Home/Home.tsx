@@ -27,6 +27,7 @@ const Home: React.FC = () => {
   const [tetra, setTetra] = useState<Tetraminos>();
   const [merge, setMerge] = useState<Cell[][]>(generateGrid());
   const [gameStatus, setGameStatus] = useState<string>("Waiting");
+  const [score, setScore] = useState(0);
   // value: 0 => Empty
   // value: 1 => Block
   // value: 2 => Moving tetra
@@ -74,11 +75,21 @@ const Home: React.FC = () => {
         row.map((cell: number, cIndex: number) => {
           if (
             cell === 1 &&
-            grid[shadow.x + rIndex][shadow.y + cIndex] &&
-            grid[tetra.x + rIndex][tetra.y + cIndex]
+            shadow.x + rIndex > 0 &&
+            shadow.x + rIndex < 21 &&
+            shadow.y + cIndex > 0 &&
+            shadow.y + cIndex < 11
           ) {
             grid[shadow.x + rIndex][shadow.y + cIndex].color = tetra.color;
             grid[shadow.x + rIndex][shadow.y + cIndex].value = 4;
+          }
+          if (
+            cell === 1 &&
+            tetra.x + rIndex > 0 &&
+            tetra.x + rIndex < 21 &&
+            tetra.y + cIndex > 0 &&
+            tetra.y + cIndex < 11
+          ) {
             grid[tetra.x + rIndex][tetra.y + cIndex].color = tetra.color;
             grid[tetra.x + rIndex][tetra.y + cIndex].value = 2;
           }
@@ -123,7 +134,21 @@ const Home: React.FC = () => {
         newMerge.splice(1, 0, newLine);
       }
     });
-    if (lines > 1) socket.emit("order:newLine", lines - 1);
+    switch (lines) {
+      case 1:
+        setScore(score + 40);
+        break;
+      case 2:
+        setScore(score + 100);
+        break;
+      case 3:
+        setScore(score + 300);
+        break;
+      case 4:
+        setScore(score + 1200);
+        break;
+    }
+    if (lines > 0) socket.emit("order:newLine", lines);
     setMerge(newMerge);
     if (newMerge[1].find((cell) => cell.value === 3)) {
       setGameStatus("Game Over");
@@ -143,7 +168,11 @@ const Home: React.FC = () => {
   };
   useEffect(() => {
     socket.on("newTetra", (tetra: Tetraminos) => {
-      if (gameStatus === "Waiting") {
+      if (
+        gameStatus === "Waiting" ||
+        gameStatus === "Winner" ||
+        gameStatus === "Game Over"
+      ) {
         setGameStatus("Playing");
       }
       setTetra(tetra);
@@ -188,7 +217,7 @@ const Home: React.FC = () => {
     <Row justify="space-around">
       <Col span={4}></Col>
       <Col span={12}>
-        <Row>
+        <Row style={{ width: "600px" }}>
           <GridComponent grid={grid}></GridComponent>
           {tetra ? (
             <ActionsComponent
@@ -198,7 +227,11 @@ const Home: React.FC = () => {
               gameStatus={gameStatus}
             ></ActionsComponent>
           ) : null}
-          <ScoreComponent gameStatus={gameStatus}></ScoreComponent>
+          <ScoreComponent
+            gameStatus={gameStatus}
+            score={score}
+            reset={setMerge}
+          ></ScoreComponent>
         </Row>
       </Col>
       <Col span={4}></Col>

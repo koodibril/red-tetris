@@ -5,11 +5,15 @@ import { rotateCounterClockwise } from "src/utils/utils";
 import { Tetraminos } from "../Tetraminos/Tetraminos.d";
 import styles from "./Score.module.css";
 
-const Score: React.FC<{ gameStatus: string }> = (props) => {
+const Score: React.FC<{ gameStatus: string; score: number; reset: any }> = (
+  props
+) => {
   const [info, setInfo] = useState<string[]>([]);
   const [admin, setAdmin] = useState(false);
   const [next, setNext] = useState<Tetraminos[]>([]);
+  const [position, setPosition] = useState([1, 1]);
   const handleStart = () => {
+    props.reset();
     socket.emit("order:start", {
       room: window.location.href.split("/")[3].split("[")[0],
       name: window.location.href.split("/")[3].split("[")[1].slice(0, -1),
@@ -42,29 +46,20 @@ const Score: React.FC<{ gameStatus: string }> = (props) => {
       socket.off("nextTetra");
     };
   }, [next]);
+  useEffect(() => {
+    socket.on("position", (position: [number, number]) => {
+      setPosition(position);
+    });
+    return () => {
+      socket.off("nextTetra");
+    };
+  }, []);
   const generateNext = () => {
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "80%",
-          marginLeft: "10%",
-          backgroundColor: "black",
-        }}
-      >
+      <div className={styles.next}>
         {next.map((tetra, tindex) => {
           return (
-            <div
-              style={{
-                display: "flex",
-                paddingTop: "5px",
-                paddingBottom: "5px",
-              }}
-              key={tindex}
-            >
+            <div className={styles.tetra} key={tindex}>
               {tetra.shape.map((row: number[], rIndex) => {
                 return (
                   <div key={rIndex}>
@@ -72,10 +67,8 @@ const Score: React.FC<{ gameStatus: string }> = (props) => {
                       if (cell === 1) {
                         return (
                           <div
+                            className={styles.tetrablock}
                             style={{
-                              height: "20px",
-                              width: "20px",
-                              border: "1px solid white",
                               backgroundColor: tetra.color,
                             }}
                             key={index}
@@ -84,10 +77,10 @@ const Score: React.FC<{ gameStatus: string }> = (props) => {
                       }
                       return (
                         <div
+                          className={styles.tetrablock}
                           style={{
-                            height: "20px",
-                            width: "20px",
                             backgroundColor: "black",
+                            border: "none",
                           }}
                           key={index}
                         ></div>
@@ -104,19 +97,49 @@ const Score: React.FC<{ gameStatus: string }> = (props) => {
   };
   return (
     <Col className={styles.marge}>
-      NEXT
-      <Row style={{ width: "200px", height: "400px" }}>{generateNext()}</Row>
-      SCORE
-      <Row>
-        {info.map((el, index) => {
-          return <p key={index}>{el}</p>;
-        })}
+      <p className={styles.scoreTitles}>NEXT</p>
+      <Row style={{ width: "150px", height: "400px" }}>{generateNext()}</Row>
+      <p className={styles.scoreTitles}>SCORE</p>
+      <Row style={{ width: "150px", height: "253px" }}>
+        <div className={styles.score}>
+          <p>Score: {props.score}</p>
+          <p>Position: {`${position[0]} / ${position[1]}`}</p>
+        </div>
       </Row>
-      {props.gameStatus === "Waiting" && admin ? (
-        <Button onClick={handleStart}>Play</Button>
-      ) : (
-        "Waiting for the admin to launch"
-      )}
+      {props.gameStatus === "Waiting" ? (
+        <div className={styles.flying}>
+          {admin ? (
+            <p style={{ margin: 0 }}>READY ?</p>
+          ) : (
+            <p style={{ margin: 0 }}>WAITING</p>
+          )}
+          {admin ? (
+            <Button className={styles.flyingButton} onClick={handleStart}>
+              <span>START</span>
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
+      {props.gameStatus === "Winner" ? (
+        <div className={styles.flying}>
+          <p style={{ margin: 0 }}>WINNER</p>
+          {admin ? (
+            <Button className={styles.flyingButton} onClick={handleStart}>
+              <span>RESTART</span>
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
+      {props.gameStatus === "Game Over" ? (
+        <div className={styles.flying}>
+          <p style={{ margin: 0 }}>GAME OVER</p>
+          {admin ? (
+            <Button className={styles.flyingButton} onClick={handleStart}>
+              <span>RESTART</span>
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
     </Col>
   );
 };

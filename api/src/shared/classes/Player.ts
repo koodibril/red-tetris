@@ -3,11 +3,13 @@ export class Player {
   private _tetra: number;
   private _status: string;
   private _name: string;
+  private _score: number;
   constructor(id: string, name: string) {
     this._id = id;
     this._tetra = 0;
     this._status = "Waiting";
     this._name = name;
+    this._score = 0;
   }
 
   getId() {
@@ -30,5 +32,25 @@ export class Player {
   }
   setStatus(status: string) {
     this._status = status;
+  }
+
+  getScore() {
+    return this._score;
+  }
+  setScore(lines: number) {
+    switch (lines) {
+      case 1:
+        this._score += 40;
+        break;
+      case 2:
+        this._score += 100;
+        break;
+      case 3:
+        this._score += 300;
+        break;
+      case 4:
+        this._score += 1200;
+        break;
+    }
   }
 }

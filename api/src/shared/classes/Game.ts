@@ -85,4 +85,19 @@ export class Game {
   getAdmin() {
     return this._admin;
   }
+
+  getPosition(id: string) {
+    const players = this._players.sort((a, b) => {
+      const scoreA = a.getScore();
+      const scoreB = b.getScore();
+      return scoreA - scoreB;
+    });
+    const position = [0, players.length];
+    players.forEach((player, index) => {
+      if (player.getId() === id) {
+        position[0] = index + 1;
+      }
+    });
+    return position;
+  }
 }

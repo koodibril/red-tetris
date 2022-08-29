@@ -10,7 +10,6 @@ export const sockets = (io: Server, socket: Socket) => {
   const endTetra = (payload: SocketData) => {
     const room = rooms.find((el) => el.getRoomName() === payload.room);
     const player = room?.getPlayer(socket.id);
-    console.log(player?.getTetra(), room?.getTetraminos().length);
     if (
       player &&
       room &&
@@ -39,14 +38,20 @@ export const sockets = (io: Server, socket: Socket) => {
   const newLine = (lines: number) => {
     const room = rooms.find((room) => room.getPlayer(socket.id));
     console.log(
-      `${room?.getPlayer(socket.id)?.getName()} completed one line !`
+      `${room?.getPlayer(socket.id)?.getName()} completed ${lines} lines !`
     );
     if (room) {
-      io.to(room.getRoomName()).emit(
-        "info",
-        `Player ${room.getPlayer(socket.id)?.getName()} gift everyone a malus !`
-      );
-      socket.broadcast.to(room.getRoomName()).emit("newline", lines);
+      room.getPlayer(socket.id)?.setScore(lines);
+      if (lines - 1 > 0) {
+        io.to(room.getRoomName()).emit(
+          "info",
+          `Player ${room
+            .getPlayer(socket.id)
+            ?.getName()} gift everyone a malus !`
+        );
+        socket.broadcast.to(room.getRoomName()).emit("newline", lines - 1);
+      }
+      socket.emit("position", room.getPosition(socket.id));
     }
   };
   const startGame = (payload: SocketData) => {
@@ -108,10 +113,11 @@ export const sockets = (io: Server, socket: Socket) => {
           const id = player.getId();
           if (!sockets.has(id)) {
             room.removePlayer(player);
+          } else {
+            socket.emit("position", room.getPosition(id));
           }
         });
       }
-      console.log(room.getPlayers());
       socket.to(room.getAdmin().getId()).emit("admin");
     } else {
       console.log(
