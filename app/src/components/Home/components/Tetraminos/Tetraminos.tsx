@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useTetris, useTetrisActions } from "src/ducks/tetris/actions/tetris";
 import {
   matrixSizeBottom,
   matrixSizeLeft,
@@ -10,11 +11,10 @@ import { Cell } from "../Grid/Grid.d";
 import { Tetraminos } from "./Tetraminos.d";
 
 const Actions: React.FC<{
-  tetra: Tetraminos;
-  control: React.Dispatch<React.SetStateAction<Tetraminos | undefined>>;
   grid: Cell[][];
-  gameStatus: string;
 }> = (props) => {
+  const { tetra, gameStatus } = useTetris();
+  const { setTetra } = useTetrisActions();
   const checkMerge = (tetra: Tetraminos) => {
     let touch = false;
     tetra.shape.map((row: number[], rIndex: number) => {
@@ -88,41 +88,41 @@ const Actions: React.FC<{
       newTetra.x = newTetra.x + 1;
     }
     newTetra.x = newTetra.x - 1;
-    props.control(newTetra);
+    setTetra(newTetra);
   };
   const handleKeyPress = (e: KeyboardEvent) => {
     e.preventDefault();
     const key = e.key;
     let newTetra;
-    if (props.gameStatus === "Playing") {
+    if (gameStatus === "Playing" && tetra) {
       switch (key) {
         case " ":
-          newTetra = moveDown(props.tetra);
-          props.control(newTetra);
+          newTetra = moveDown(tetra);
+          setTetra(newTetra);
           break;
         case "ArrowUp":
           if (
-            props.tetra.shape[0][2] === 1 &&
-            props.tetra.shape[0][1] === 1 &&
-            props.tetra.shape[1][2] === 1 &&
-            props.tetra.shape[1][1] === 1
+            tetra.shape[0][2] === 1 &&
+            tetra.shape[0][1] === 1 &&
+            tetra.shape[1][2] === 1 &&
+            tetra.shape[1][1] === 1
           ) {
             break;
           } else {
-            newTetra = rotate(props.tetra);
-            props.control(newTetra);
+            newTetra = rotate(tetra);
+            setTetra(newTetra);
           }
           break;
         case "ArrowLeft":
-          newTetra = moveLeft(props.tetra);
-          props.control(newTetra);
+          newTetra = moveLeft(tetra);
+          setTetra(newTetra);
           break;
         case "ArrowRight":
-          newTetra = moveRight(props.tetra);
-          props.control(newTetra);
+          newTetra = moveRight(tetra);
+          setTetra(newTetra);
           break;
         case "ArrowDown":
-          fallDown(props.tetra);
+          fallDown(tetra);
           break;
       }
     }

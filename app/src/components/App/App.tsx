@@ -14,11 +14,14 @@ import styles from "./App.module.css";
 import { socket } from "src/hooks/useSocket";
 import { useNavigation } from "src/ducks/navigation/navigation";
 import UserComponent from "../Home/components/Score/Username";
+import { useTetris, useTetrisActions } from "src/ducks/tetris/actions/tetris";
 
 const { Content, Header } = Layout;
 
 const App: React.FC = () => {
   const messageState = useMessage();
+  const { room, name } = useTetris();
+  const { listenToServer } = useTetrisActions();
   const { clearMessage } = useMessageActions();
   const { pushState } = useNavigation();
   const [modal, setModal] = useState(true);
@@ -35,18 +38,13 @@ const App: React.FC = () => {
   }, [message, messageState]);
 
   useEffect(() => {
-    const user = window.location.href.split("/")[3].split("[")[1];
-    if (user) {
-      pushState("/" + window.location.href.split("/")[3].split("[")[0]);
+    if (room && name) {
+      pushState(`/${room}[${name}]`);
     }
-    socket.on("connect", () => {
-      const room = window.location.href.split("/")[3].split("[")[0];
-      if (!room) {
-        socket.on("room", (roomId: number) => {
-          pushState("/" + roomId);
-        });
-      }
-    });
+  }, [room, name]);
+
+  useEffect(() => {
+    listenToServer(socket);
   }, []);
 
   return (

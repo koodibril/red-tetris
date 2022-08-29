@@ -90,7 +90,7 @@ export class Game {
     const players = this._players.sort((a, b) => {
       const scoreA = a.getScore();
       const scoreB = b.getScore();
-      return scoreA - scoreB;
+      return scoreB - scoreA;
     });
     const position = [0, players.length];
     players.forEach((player, index) => {

@@ -1,19 +1,16 @@
-import { Button, Col, Form, Input, Modal } from "antd";
+import { Button, Form, Input, Modal } from "antd";
 import React from "react";
-import { useNavigation } from "src/ducks/navigation/navigation";
+import { useTetris, useTetrisActions } from "src/ducks/tetris/actions/tetris";
 import { socket } from "src/hooks/useSocket";
 
-const Username: React.FC<{ visible: boolean; setVisible: any }> = (props) => {
-  const { pushState } = useNavigation();
+const Username: React.FC<{
+  visible: boolean;
+  setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+}> = (props) => {
+  const { joinRoom } = useTetrisActions();
+  const { room } = useTetris();
   const handleSubmit = (formData: { Username: string }) => {
-    localStorage.setItem("username", formData.Username);
-    const room = window.location.href.split("/")[3].split("[")[0];
-    socket.emit("order:join", {
-      room: room,
-      name: formData.Username,
-      tetraminos: undefined,
-    });
-    pushState("/" + room + "[" + formData.Username + "]");
+    joinRoom(socket, room, formData.Username);
     props.setVisible(false);
   };
   return (

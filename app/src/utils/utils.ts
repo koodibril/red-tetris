@@ -1,8 +1,8 @@
-export const matrixSizeLeft = (matrix: any) => {
+export const matrixSizeLeft = (matrix: number[][]) => {
   let matrixLength = 4;
-  matrix.map((row: any, rIndex: number) => {
+  matrix.map((row: number[]) => {
     let rowLength = 4;
-    row.map((cell: any, cIndex: number) => {
+    row.map((cell: number, cIndex: number) => {
       if (cell === 1 && cIndex < rowLength) {
         rowLength = cIndex;
       }
@@ -14,11 +14,11 @@ export const matrixSizeLeft = (matrix: any) => {
   return matrixLength;
 };
 
-export const matrixSizeRight = (matrix: any) => {
+export const matrixSizeRight = (matrix: number[][]) => {
   let matrixLength = 1;
-  matrix.map((row: any, rIndex: number) => {
+  matrix.map((row: number[]) => {
     let rowLength = 1;
-    row.map((cell: any, cIndex: number) => {
+    row.map((cell: number, cIndex: number) => {
       if (cell === 1 && cIndex > rowLength) {
         rowLength = cIndex;
       }
@@ -30,11 +30,11 @@ export const matrixSizeRight = (matrix: any) => {
   return matrixLength;
 };
 
-export const matrixSizeBottom = (matrix: any) => {
+export const matrixSizeBottom = (matrix: number[][]) => {
   let matrixLength = 1;
-  matrix.map((row: any, rIndex: number) => {
+  matrix.map((row: number[], rIndex: number) => {
     let rowLength = 1;
-    row.map((cell: any, cIndex: number) => {
+    row.map((cell: number) => {
       if (cell === 1 && rIndex > rowLength) {
         rowLength = rIndex;
       }
@@ -46,8 +46,18 @@ export const matrixSizeBottom = (matrix: any) => {
   return matrixLength;
 };
 
-export const rotateClockwise = (a: any) => {
+const copyMatrix = (toCopy: number[][]) => {
+  const matrix = [];
+  for (let i = 0; i < toCopy.length; i++) {
+    matrix.push([...toCopy[i]]);
+  }
+  return matrix;
+};
+
+export const rotateClockwise = (copy: number[][]) => {
+  const a = copyMatrix(copy);
   const n = a.length;
+
   for (let i = 0; i < n / 2; i++) {
     for (let j = i; j < n - i - 1; j++) {
       const tmp = a[i][j];
@@ -60,7 +70,8 @@ export const rotateClockwise = (a: any) => {
   return a;
 };
 
-export const rotateCounterClockwise = (a: any) => {
+export const rotateCounterClockwise = (copy: number[][]) => {
+  const a = copyMatrix(copy);
   const n = a.length;
   for (let i = 0; i < n / 2; i++) {
     for (let j = i; j < n - i - 1; j++) {

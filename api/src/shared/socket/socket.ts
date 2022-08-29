@@ -33,6 +33,7 @@ export const sockets = (io: Server, socket: Socket) => {
         );
       }
       socket.emit("nextTetra", nextTetra);
+      socket.emit("position", room.getPosition(socket.id));
     }
   };
   const newLine = (lines: number) => {
@@ -51,7 +52,6 @@ export const sockets = (io: Server, socket: Socket) => {
         );
         socket.broadcast.to(room.getRoomName()).emit("newline", lines - 1);
       }
-      socket.emit("position", room.getPosition(socket.id));
     }
   };
   const startGame = (payload: SocketData) => {
@@ -83,8 +83,8 @@ export const sockets = (io: Server, socket: Socket) => {
         );
         room.setStatus("Waiting");
         room.resetTetraminos();
-        socket.to(room.getAdmin().getId()).emit("admin");
-        socket.to(winner.getId()).emit("winner");
+        io.to(room.getAdmin().getId()).emit("admin");
+        io.to(winner.getId()).emit("winner");
       }
       io.to(room.getRoomName()).emit(
         "info",
@@ -114,11 +114,12 @@ export const sockets = (io: Server, socket: Socket) => {
           if (!sockets.has(id)) {
             room.removePlayer(player);
           } else {
-            socket.emit("position", room.getPosition(id));
+            console.log(id, room.getPosition(id));
+            io.to(id).emit("position", room.getPosition(id));
           }
         });
       }
-      socket.to(room.getAdmin().getId()).emit("admin");
+      io.to(room.getAdmin().getId()).emit("admin");
     } else {
       console.log(
         `Creating new room for player ${payload.name} => ${payload.room}`
@@ -142,7 +143,7 @@ export const sockets = (io: Server, socket: Socket) => {
             tetraminos: undefined,
           });
           room.removePlayer(player);
-          socket.to(room.getAdmin().getId()).emit("admin");
+          io.to(room.getAdmin().getId()).emit("admin");
         }
       }
     });
