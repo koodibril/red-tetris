@@ -18,7 +18,7 @@ test('matrix size right', () => {
         [0, 0, 0, 0],
         [0, 0, 0, 0],
     ];
-    expect(matrixSizeRight(matrix)).toBe(2);
+    expect(matrixSizeRight(matrix)).toBe(1);
 });
 
 test('matrix size Bottom', () => {

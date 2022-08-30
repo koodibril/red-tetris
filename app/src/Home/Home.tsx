@@ -10,6 +10,7 @@ import { useTetris, useTetrisActions } from "../ducks/tetris/actions/tetris";
 import { socket } from "../hooks/useSocket";
 import { useInterval } from "../hooks/useInterval";
 import { generateGrid } from "../utils/utils";
+import { checkMerge } from "./components/Tetraminos/TetraminosActions";
 
 const Home: React.FC = () => {
   const {
@@ -25,24 +26,6 @@ const Home: React.FC = () => {
   } = useTetrisActions();
   const { tetra, gameStatus, score, merge, name, room } = useTetris();
 
-  const checkMerge = (tetra: Tetraminos, grid: Cell[][]) => {
-    let touch = false;
-    tetra.shape.map((row: number[], rIndex: number) => {
-      row.map((cell: number, cIndex: number) => {
-        if (
-          cell === 1 &&
-          tetra.x + rIndex !== 0 &&
-          grid &&
-          grid[tetra.x + rIndex][tetra.y + cIndex].value !== 0 &&
-          grid[tetra.x + rIndex][tetra.y + cIndex].value !== 2 &&
-          grid[tetra.x + rIndex][tetra.y + cIndex].value !== 4
-        ) {
-          touch = true;
-        }
-      });
-    });
-    return touch;
-  };
   const createShadow = (tetra: Tetraminos, grid: Cell[][]) => {
     const newTetra = { ...tetra };
     while (!checkMerge(newTetra, grid)) {

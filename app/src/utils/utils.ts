@@ -21,8 +21,8 @@ export const matrixSizeRight = (matrix: number[][]) => {
   matrix.map((row: number[]) => {
     let rowLength = 1;
     row.map((cell: number, cIndex: number) => {
-      if (cell === 1 && cIndex + 1 > rowLength) {
-        rowLength = cIndex + 1;
+      if (cell === 1 && cIndex > rowLength) {
+        rowLength = cIndex;
       }
     });
     if (rowLength > matrixLength) {
