@@ -2,28 +2,13 @@ import { Row } from "antd";
 import React, { useEffect, useMemo } from "react";
 import { useTetris, useTetrisActions } from "../../../ducks/tetris/actions/tetris";
 import { socket } from "../../../hooks/useSocket";
-import GridComponent from "../../../Home/components/Grid/Grid";
-import { Cell } from "../Grid/Grid.d";
+import GridComponent from "../Grid/Grid";
 import { Oponent } from "../../../ducks/tetris/tetrisSlice";
+import { generateGrid } from "../../../utils/utils";
 
 const Oponents: React.FC<{ side: boolean }> = (props) => {
   const { listenToOponents } = useTetrisActions();
   const { oponents, position, gameStatus } = useTetris();
-  const generateGrid = () => {
-    const grid: Cell[][] = [];
-    for (let i = 0; i < 22; i++) {
-      const newCol = [];
-      for (let j = 0; j < 12; j++) {
-        if (i === 0 || j === 0 || i === 21 || j === 11) {
-          newCol.push({ value: 1, color: "grey" });
-        } else {
-          newCol.push({ value: 0, color: "lightgrey" });
-        }
-      }
-      grid.push(newCol);
-    }
-    return grid;
-  };
   useEffect(() => {
     listenToOponents(socket);
     return () => {

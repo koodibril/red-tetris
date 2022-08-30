@@ -9,6 +9,7 @@ import OponentsComponent from "./components/Oponents/Oponents";
 import { useTetris, useTetrisActions } from "../ducks/tetris/actions/tetris";
 import { socket } from "../hooks/useSocket";
 import { useInterval } from "../hooks/useInterval";
+import { generateGrid } from "../utils/utils";
 
 const Home: React.FC = () => {
   const {
@@ -23,21 +24,6 @@ const Home: React.FC = () => {
     addMalus,
   } = useTetrisActions();
   const { tetra, gameStatus, score, merge, name, room } = useTetris();
-  const generateGrid = () => {
-    const grid: Cell[][] = [];
-    for (let i = 0; i < 22; i++) {
-      const newCol = [];
-      for (let j = 0; j < 12; j++) {
-        if (i === 0 || j === 0 || i === 21 || j === 11) {
-          newCol.push({ value: 1, color: "grey" });
-        } else {
-          newCol.push({ value: 0, color: "lightgrey" });
-        }
-      }
-      grid.push(newCol);
-    }
-    return grid;
-  };
 
   const checkMerge = (tetra: Tetraminos, grid: Cell[][]) => {
     let touch = false;

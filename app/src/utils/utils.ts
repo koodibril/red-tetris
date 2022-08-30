@@ -1,3 +1,5 @@
+import { Cell } from "../Home/components/Grid/Grid.d";
+
 export const matrixSizeLeft = (matrix: number[][]) => {
   let matrixLength = 4;
   matrix.map((row: number[]) => {
@@ -19,8 +21,8 @@ export const matrixSizeRight = (matrix: number[][]) => {
   matrix.map((row: number[]) => {
     let rowLength = 1;
     row.map((cell: number, cIndex: number) => {
-      if (cell === 1 && cIndex > rowLength) {
-        rowLength = cIndex;
+      if (cell === 1 && cIndex + 1 > rowLength) {
+        rowLength = cIndex + 1;
       }
     });
     if (rowLength > matrixLength) {
@@ -46,7 +48,7 @@ export const matrixSizeBottom = (matrix: number[][]) => {
   return matrixLength;
 };
 
-const copyMatrix = (toCopy: number[][]) => {
+export const copyMatrix = (toCopy: number[][]) => {
   const matrix = [];
   for (let i = 0; i < toCopy.length; i++) {
     matrix.push([...toCopy[i]]);
@@ -83,4 +85,20 @@ export const rotateCounterClockwise = (copy: number[][]) => {
     }
   }
   return a;
+};
+
+export const generateGrid = () => {
+  const grid: Cell[][] = [];
+  for (let i = 0; i < 22; i++) {
+    const newCol = [];
+    for (let j = 0; j < 12; j++) {
+      if (i === 0 || j === 0 || i === 21 || j === 11) {
+        newCol.push({ value: 1, color: "grey" });
+      } else {
+        newCol.push({ value: 0, color: "lightgrey" });
+      }
+    }
+    grid.push(newCol);
+  }
+  return grid;
 };
