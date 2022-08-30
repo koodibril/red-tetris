@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Cell } from "src/components/Home/components/Grid/Grid.d";
-import { Tetraminos } from "src/components/Home/components/Tetraminos/Tetraminos.d";
+import { Cell } from "../../Home/components/Grid/Grid.d";
+import { Tetraminos } from "../../Home/components/Tetraminos/Tetraminos.d";
 
 export interface Oponent {
   status: string;

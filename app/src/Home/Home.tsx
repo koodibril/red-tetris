@@ -2,13 +2,13 @@ import React, { useEffect, useMemo } from "react";
 import ScoreComponent from "./components/Score/Score";
 import GridComponent from "./components/Grid/Grid";
 import ActionsComponent from "./components/Tetraminos/Tetraminos";
-import { useInterval } from "src/hooks/useInterval";
 import { Tetraminos } from "./components/Tetraminos/Tetraminos.d";
 import { Cell } from "./components/Grid/Grid.d";
 import { Col, Row } from "antd";
-import { socket } from "src/hooks/useSocket";
-import { useTetris, useTetrisActions } from "src/ducks/tetris/actions/tetris";
 import OponentsComponent from "./components/Oponents/Oponents";
+import { useTetris, useTetrisActions } from "../ducks/tetris/actions/tetris";
+import { socket } from "../hooks/useSocket";
+import { useInterval } from "../hooks/useInterval";
 
 const Home: React.FC = () => {
   const {

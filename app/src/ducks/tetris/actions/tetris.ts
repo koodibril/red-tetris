@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useAppDispatch, useAppSelector } from "src/hooks/hooks";
-import { AppDispatch, RootState } from "src/store/configure";
+import { useAppDispatch, useAppSelector } from "../../../hooks/hooks";
+import { AppDispatch, RootState } from "../../../store/configure";
 import {
   setTetra,
   clearTetra,
@@ -16,11 +16,11 @@ import {
   setRoom,
   setName,
   setOponents,
-} from "src/ducks/tetris/tetrisSlice";
-import { Tetraminos } from "src/components/Home/components/Tetraminos/Tetraminos.d";
+} from "../tetrisSlice";
+import { Tetraminos } from "../../../Home/components/Tetraminos/Tetraminos.d";
 import { Socket } from "socket.io-client";
-import { rotateCounterClockwise } from "src/utils/utils";
-import { Cell } from "src/components/Home/components/Grid/Grid.d";
+import { rotateCounterClockwise } from "../../../utils/utils";
+import { Cell } from "../../../Home/components/Grid/Grid.d";
 
 const listenToNewTetra = (socket: Socket) => (dispatch: AppDispatch) => {
   socket.on("newTetra", (tetra: Tetraminos) => {

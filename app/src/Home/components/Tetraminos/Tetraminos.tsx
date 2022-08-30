@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
-import { useTetris, useTetrisActions } from "src/ducks/tetris/actions/tetris";
+import { useTetris, useTetrisActions } from "../../../ducks/tetris/actions/tetris";
 import {
   matrixSizeBottom,
   matrixSizeLeft,
   matrixSizeRight,
   rotateClockwise,
   rotateCounterClockwise,
-} from "src/utils/utils";
+} from "../../../utils/utils";
 import { Cell } from "../Grid/Grid.d";
 import { Tetraminos } from "./Tetraminos.d";
 

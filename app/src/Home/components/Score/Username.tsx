@@ -1,7 +1,7 @@
 import { Button, Form, Input, Modal } from "antd";
 import React from "react";
-import { useTetris, useTetrisActions } from "src/ducks/tetris/actions/tetris";
-import { socket } from "src/hooks/useSocket";
+import { useTetris, useTetrisActions } from "../../../ducks/tetris/actions/tetris";
+import { socket } from "../../../hooks/useSocket";
 
 const Username: React.FC<{
   visible: boolean;

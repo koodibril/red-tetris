@@ -1,10 +1,8 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
-import message from "src/ducks/message/messageSlice";
-import tetris from "src/ducks/tetris/tetrisSlice";
+import tetris from "../ducks/tetris/tetrisSlice";
 
 export const store = configureStore({
   reducer: {
-    message: message,
     tetris: tetris,
   },
 });

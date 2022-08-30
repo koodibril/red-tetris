@@ -1,13 +1,13 @@
 import React from "react";
 
-import { Route, Navigate, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
-import App from "./components/App/App";
+import HomeComponent from "./Home/Home";
 
-const AppRoute: React.FC = () => (
+const AppRoutes: React.FC = () => (
   <Routes>
-    <Route path="*" element={<App />}></Route>
+    <Route path="*" element={<HomeComponent />}></Route>
   </Routes>
 );
 
-export default AppRoute;
+export default AppRoutes;

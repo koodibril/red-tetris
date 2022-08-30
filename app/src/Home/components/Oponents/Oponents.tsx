@@ -1,10 +1,10 @@
 import { Row } from "antd";
 import React, { useEffect, useMemo } from "react";
-import { useTetris, useTetrisActions } from "src/ducks/tetris/actions/tetris";
-import { socket } from "src/hooks/useSocket";
-import GridComponent from "src/components/Home/components/Grid/Grid";
+import { useTetris, useTetrisActions } from "../../../ducks/tetris/actions/tetris";
+import { socket } from "../../../hooks/useSocket";
+import GridComponent from "../../../Home/components/Grid/Grid";
 import { Cell } from "../Grid/Grid.d";
-import { Oponent } from "src/ducks/tetris/tetrisSlice";
+import { Oponent } from "../../../ducks/tetris/tetrisSlice";
 
 const Oponents: React.FC<{ side: boolean }> = (props) => {
   const { listenToOponents } = useTetrisActions();

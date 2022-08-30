@@ -1,7 +1,7 @@
 import { Button } from "antd";
 import React, { useEffect } from "react";
-import { useTetris, useTetrisActions } from "src/ducks/tetris/actions/tetris";
-import { socket } from "src/hooks/useSocket";
+import { useTetris, useTetrisActions } from "../../../ducks/tetris/actions/tetris";
+import { socket } from "../../../hooks/useSocket";
 import styles from "./Score.module.css";
 
 const Score: React.FC = () => {
