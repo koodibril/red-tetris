@@ -1,22 +1,13 @@
-import { Button, Col, Row } from "antd";
+import { Col, Row } from "antd";
 import React, { useEffect } from "react";
 import { useTetris, useTetrisActions } from "src/ducks/tetris/actions/tetris";
 import { socket } from "src/hooks/useSocket";
 import styles from "./Score.module.css";
 
 const Score: React.FC = () => {
-  const { info, admin, score, gameStatus, nextTetra, position, room, name } =
-    useTetris();
-  const {
-    listenToInfo,
-    listenToAdmin,
-    listenToNextTetra,
-    listenToPosition,
-    start,
-  } = useTetrisActions();
-  const handleStart = () => {
-    start(socket, room, name);
-  };
+  const { info, score, nextTetra, position } = useTetris();
+  const { listenToInfo, listenToAdmin, listenToNextTetra, listenToPosition } =
+    useTetrisActions();
   useEffect(() => {
     listenToInfo(socket);
     return () => {
@@ -86,40 +77,6 @@ const Score: React.FC = () => {
           <p>Position: {`${position[0]} / ${position[1]}`}</p>
         </div>
       </Row>
-      {gameStatus === "Waiting" ? (
-        <div className={styles.flying}>
-          {admin ? (
-            <p style={{ margin: 0 }}>READY ?</p>
-          ) : (
-            <p style={{ margin: 0 }}>WAITING</p>
-          )}
-          {admin ? (
-            <Button className={styles.flyingButton} onClick={handleStart}>
-              <span>START</span>
-            </Button>
-          ) : null}
-        </div>
-      ) : null}
-      {gameStatus === "Winner" ? (
-        <div className={styles.flying}>
-          <p style={{ margin: 0 }}>WINNER</p>
-          {admin ? (
-            <Button className={styles.flyingButton} onClick={handleStart}>
-              <span>RESTART</span>
-            </Button>
-          ) : null}
-        </div>
-      ) : null}
-      {gameStatus === "Game Over" ? (
-        <div className={styles.flying}>
-          <p style={{ margin: 0 }}>GAME OVER</p>
-          {admin ? (
-            <Button className={styles.flyingButton} onClick={handleStart}>
-              <span>RESTART</span>
-            </Button>
-          ) : null}
-        </div>
-      ) : null}
     </Col>
   );
 };

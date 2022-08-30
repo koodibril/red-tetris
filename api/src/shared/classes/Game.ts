@@ -106,6 +106,8 @@ export class Game {
       const oponent = {
         status: player.getStatus(),
         shadow: player.getShadow(),
+        id: player.getId(),
+        name: player.getName(),
       };
       return oponent;
     });

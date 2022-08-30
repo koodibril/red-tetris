@@ -53,9 +53,9 @@
   justify-content: center;
   justify-items: center;
   position: fixed;
-  top: 30%;
-  left: 0;
-  width: 100%;
+  top: 30vh;
+  left: 10vw;
+  width: 80vw;
   font-family: "Tetris Mania Type", sans-serif;
   font-size: 140px;
   color: white;

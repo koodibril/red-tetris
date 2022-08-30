@@ -1,17 +1,22 @@
-import React, { useMemo } from "react";
+import React from "react";
+import { Cell } from "./Grid.d";
 import styles from "./Grid.module.css";
 
 const Grid: React.FC<{
-  grid: any;
+  grid: Cell[][];
   cellSize: string;
   borderSize: string;
-  padding: string;
+  paddingTop: string;
+  paddingLeft: string;
+  paddingBottom: string;
+  paddingRight: string;
+  status: string | undefined;
 }> = (props) => {
   const generateGrid = () => {
-    return props.grid.map((el: any, rIndex: number) => {
+    return props.grid.map((el: Cell[], rIndex: number) => {
       return (
         <div className={styles.row} key={rIndex}>
-          {el.map((cas: any, cIndex: number) => {
+          {el.map((cas: Cell, cIndex: number) => {
             const cell =
               cIndex === 0 || cIndex === 11 || rIndex === 0 || rIndex === 21 ? (
                 <div
@@ -61,12 +66,18 @@ const Grid: React.FC<{
     <div
       className={styles.background}
       style={{
-        paddingTop: props.padding,
-        paddingLeft: props.padding,
-        paddingBottom: props.padding,
+        paddingTop: props.paddingTop,
+        paddingLeft: props.paddingLeft,
+        paddingBottom: props.paddingBottom,
+        paddingRight: props.paddingRight,
       }}
     >
       {generateGrid()}
+      {props.status !== undefined ? (
+        <div className={styles.status} style={{ fontSize: props.cellSize }}>
+          {props.status}
+        </div>
+      ) : null}
     </div>
   );
 };

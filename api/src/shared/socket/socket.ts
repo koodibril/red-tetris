@@ -80,17 +80,35 @@ export const sockets = (io: Server, socket: Socket) => {
   const gameOver = (payload: SocketData) => {
     const room = rooms.find((el) => el.getRoomName() === payload.room);
     if (room && room.getStatus() === "Playing") {
-      room.getPlayer(socket.id)?.setStatus("GameOver");
+      room.getPlayer(socket.id)?.setStatus("Game Over");
+      room.getPlayer(socket.id)?.setShadow(payload.grid);
+      socket.broadcast
+        .to(room.getRoomName())
+        .emit("oponents", room.getOponents());
       const winner = room.checkWinner();
       if (winner) {
+        winner.setStatus("Winner");
         io.to(room.getRoomName()).emit(
           "info",
           `Player ${winner.getName()} win the game !`
         );
+        socket.broadcast
+          .to(room.getRoomName())
+          .emit("oponents", room.getOponents());
         room.setStatus("Waiting");
         room.resetTetraminos();
         io.to(room.getAdmin().getId()).emit("admin");
         io.to(winner.getId()).emit("winner");
+        room.getPlayers().forEach((player) => {
+          player.setTetra(0);
+          player.setScore(0);
+          player.setShadow(undefined);
+          player.setStatus("Waiting");
+        });
+      } else {
+        socket.broadcast
+          .to(room.getRoomName())
+          .emit("oponents", room.getOponents());
       }
       io.to(room.getRoomName()).emit(
         "info",
@@ -149,6 +167,11 @@ export const sockets = (io: Server, socket: Socket) => {
           });
           room.removePlayer(player);
           io.to(room.getAdmin().getId()).emit("admin");
+          const players = room.getPlayers();
+          players.forEach((player) => {
+            const id = player.getId();
+            io.to(id).emit("position", room.getPosition(id));
+          });
         }
       }
     });

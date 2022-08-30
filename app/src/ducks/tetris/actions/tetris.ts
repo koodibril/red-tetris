@@ -140,6 +140,8 @@ const addMalus = (socket: Socket, lines: number) => {
 const start =
   (socket: Socket, room: string, name: string) => (dispatch: AppDispatch) => {
     dispatch(setMerge(undefined));
+    dispatch(setOponents(undefined));
+    dispatch(setScore(0));
     socket.emit("order:start", {
       room: room,
       name: name,

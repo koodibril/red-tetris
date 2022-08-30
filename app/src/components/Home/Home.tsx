@@ -156,7 +156,13 @@ const Home: React.FC = () => {
     const newMerge = grid;
     tetra.shape.map((row: number[], rIndex: number) => {
       row.map((cell: number, cIndex: number) => {
-        if (cell === 1 || cell === 3) {
+        if (
+          (cell === 1 || cell === 3) &&
+          tetra.x + rIndex > 0 &&
+          tetra.x + rIndex < 21 &&
+          tetra.y + cIndex > 0 &&
+          tetra.y + cIndex < 11
+        ) {
           newMerge[tetra.x + rIndex][tetra.y + cIndex].value = 3;
         }
       });
@@ -198,7 +204,7 @@ const Home: React.FC = () => {
   };
   useInterval(tick, 600);
   return (
-    <Row justify="space-between">
+    <Row justify="space-around">
       <Col span={6}>
         <OponentsComponent side={false}></OponentsComponent>
       </Col>
@@ -215,7 +221,11 @@ const Home: React.FC = () => {
             grid={grid}
             cellSize={"35px"}
             borderSize={"10px"}
-            padding={"10%"}
+            paddingTop={"10%"}
+            paddingLeft={"0px"}
+            paddingBottom={"10%"}
+            paddingRight={"0px"}
+            status={undefined}
           ></GridComponent>
           {tetra ? <ActionsComponent grid={grid}></ActionsComponent> : null}
           <ScoreComponent></ScoreComponent>

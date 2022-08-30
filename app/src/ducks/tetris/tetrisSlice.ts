@@ -2,6 +2,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Cell } from "src/components/Home/components/Grid/Grid.d";
 import { Tetraminos } from "src/components/Home/components/Tetraminos/Tetraminos.d";
 
+export interface Oponent {
+  status: string;
+  shadow: Cell[][] | undefined;
+  id: string;
+  name: string;
+}
+
 export interface TetrisState {
   gameStatus: "Winner" | "Waiting" | "Game Over" | "Playing";
   tetra: Tetraminos | undefined;
@@ -13,9 +20,7 @@ export interface TetrisState {
   merge: Cell[][] | undefined;
   room: string;
   name: string;
-  oponents:
-    | { status: TetrisState["gameStatus"]; shadow: Cell[][] }[]
-    | undefined;
+  oponents: Oponent[] | undefined;
 }
 
 const initialState: TetrisState = {

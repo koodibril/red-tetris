@@ -61,7 +61,7 @@ export class Player {
   getShadow() {
     return this._shadow;
   }
-  setShadow(shadow: Cell[][]) {
+  setShadow(shadow: Cell[][] | undefined) {
     this._shadow = shadow;
   }
 }

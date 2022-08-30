@@ -1,5 +1,4 @@
 .background {
-  padding-right: 0;
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -26,4 +25,14 @@
 }
 .brick {
   background-color: #61cbcf;
+}
+.status {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  text-align: center;
+  width: 80%;
+  font-family: "Tetris Mania Type", sans-serif;
+  color: white;
+  z-index: 100;
 }

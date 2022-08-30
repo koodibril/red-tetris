@@ -14,6 +14,7 @@ import styles from "./App.module.css";
 import { socket } from "src/hooks/useSocket";
 import { useNavigation } from "src/ducks/navigation/navigation";
 import UserComponent from "../Home/components/Score/Username";
+import FlyingComponent from "src/components/Home/components/Score/Flying";
 import { useTetris, useTetrisActions } from "src/ducks/tetris/actions/tetris";
 
 const { Content, Header } = Layout;
@@ -55,6 +56,7 @@ const App: React.FC = () => {
         </Typography.Title>
       </Header>
       <Content className={styles.content}>
+        <FlyingComponent></FlyingComponent>
         <UserComponent visible={modal} setVisible={setModal}></UserComponent>
         <Routes />
       </Content>
