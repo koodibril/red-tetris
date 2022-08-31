@@ -1,7 +1,6 @@
 import http from "http";
 import app from "./app";
 import { config as dotenvConfig } from "dotenv";
-import { info } from "./shared/utils";
 import { Server, Socket } from "socket.io";
 import { sockets } from "./shared/socket/socket";
 
@@ -52,13 +51,13 @@ export function getSocketIo() {
   return io;
 }
 const onConnection = (socket: Socket) => {
-  info("New client connected with id : " + socket.id);
+  console.log("New client connected with id : " + socket.id);
   socket.emit("connection", null);
   socket.emit("room", "#" + [...socket.rooms][0]);
   sockets(io, socket);
 };
 const onDisconnect = (socket: Socket) => {
-  info("Client Disocnnected with id : " + socket.id);
+  console.log("Client Disocnnected with id : " + socket.id);
   socket.emit("disconnect", null);
   sockets(io, socket);
 };

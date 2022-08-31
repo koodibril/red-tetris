@@ -1,5 +1,5 @@
-import { Button } from "antd";
-import React, { useEffect } from "react";
+import { Button, Row } from "antd";
+import React, { useEffect, useState } from "react";
 import { useTetris, useTetrisActions } from "../../../ducks/tetris/actions/tetris";
 import { socket } from "../../../hooks/useSocket";
 import styles from "./Score.module.css";
@@ -7,6 +7,7 @@ import styles from "./Score.module.css";
 const Score: React.FC = () => {
   const { info, admin, gameStatus, room, name } = useTetris();
   const { listenToInfo, listenToAdmin, start } = useTetrisActions();
+  const [copied, setCopied] = useState(false);
   const handleStart = () => {
     start(socket, room, name);
   };
@@ -32,9 +33,14 @@ const Score: React.FC = () => {
             <p style={{ margin: 0 }}>WAITING</p>
           )}
           {admin ? (
-            <Button className={styles.flyingButton} onClick={handleStart}>
-              <span>START</span>
-            </Button>
+            <Row>
+              <Button className={styles.flyingButton} onClick={handleStart}>
+                <span>START</span>
+              </Button>
+              <Button className={styles.flyingButton} onClick={() => {navigator.clipboard.writeText(window.location.href);setCopied(true)}}>
+                <span>{copied ? "COPIED" : "INVITE"}</span>
+              </Button>
+            </Row>
           ) : null}
         </div>
       ) : null}

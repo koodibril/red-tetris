@@ -4,7 +4,12 @@ import { Piece } from "../classes/Piece";
 import { Player } from "../classes/Player";
 import { SocketData } from "./socket.d";
 
-export const joinRoom = (io: Server, socket: Socket, payload: SocketData, rooms: Game[]) => {
+export const joinRoom = (
+  io: Server,
+  socket: Socket,
+  payload: SocketData,
+  rooms: Game[]
+) => {
   socket.join(payload.room);
   const room = rooms.find((el) => el.getRoomName() === payload.room);
   if (room) {
@@ -40,7 +45,12 @@ export const joinRoom = (io: Server, socket: Socket, payload: SocketData, rooms:
   }
 };
 
-export const startGame = (io: Server, socket: Socket, payload: SocketData, rooms: Game[]) => {
+export const startGame = (
+  io: Server,
+  socket: Socket,
+  payload: SocketData,
+  rooms: Game[]
+) => {
   console.log(`Adding 5 tetraminos in room ${payload.room}`);
   const newTetra = new Piece();
   const room = rooms.find((el) => el.getRoomName() === payload.room);
@@ -58,62 +68,71 @@ export const startGame = (io: Server, socket: Socket, payload: SocketData, rooms
   }
 };
 
-export const endTetra = (io: Server, socket: Socket, payload: SocketData, rooms: Game[]) => {
-    const room = rooms.find((el) => el.getRoomName() === payload.room);
-    const player = room?.getPlayer(socket.id);
-    if (
-      player &&
-      room &&
-      player.getTetra() === room.getTetraminos().length - 5
-    ) {
-      console.log(`Server is falling back, adding tetra`);
-      const newTetra = new Piece();
-      room.setTetraminos(newTetra);
+export const endTetra = (
+  io: Server,
+  socket: Socket,
+  payload: SocketData,
+  rooms: Game[]
+) => {
+  const room = rooms.find((el) => el.getRoomName() === payload.room);
+  const player = room?.getPlayer(socket.id);
+  if (player && room && player.getTetra() === room.getTetraminos().length - 5) {
+    console.log(`Server is falling back, adding tetra`);
+    const newTetra = new Piece();
+    room.setTetraminos(newTetra);
+  }
+  if (player && room) {
+    console.log(`Player ${payload.name} advance on next tetra`);
+    if (payload.grid) {
+      player.setShadow(payload.grid);
     }
-    if (player && room) {
-      console.log(`Player ${payload.name} advance on next tetra`);
-      if (payload.grid) {
-        player.setShadow(payload.grid);
-      }
-      player.setTetra(player.getTetra() + 1);
-      socket.emit(
-        "newTetra",
-        room.getTetraminos()[player.getTetra()].getTetraminos()
-      );
-      const nextTetra = [];
-      for (let i = 1; i < 5; i++) {
-        nextTetra.push(
-          room.getTetraminos()[player.getTetra() + i].getTetraminos()
-        );
-      }
-      socket.broadcast
-        .to(room.getRoomName())
-        .emit("oponents", room.getOponents());
-      socket.emit("nextTetra", nextTetra);
-      socket.emit("position", room.getPosition(socket.id));
-    }
-  };
-
-export const newLine = (io: Server, socket: Socket, lines: number, rooms: Game[]) => {
-    const room = rooms.find((room) => room.getPlayer(socket.id));
-    console.log(
-      `${room?.getPlayer(socket.id)?.getName()} completed ${lines} lines !`
+    player.setTetra(player.getTetra() + 1);
+    socket.emit(
+      "newTetra",
+      room.getTetraminos()[player.getTetra()].getTetraminos()
     );
-    if (room) {
-      room.getPlayer(socket.id)?.setScore(lines);
-      if (lines - 1 > 0) {
-        io.to(room.getRoomName()).emit(
-          "info",
-          `Player ${room
-            .getPlayer(socket.id)
-            ?.getName()} gift everyone a malus !`
-        );
-        socket.broadcast.to(room.getRoomName()).emit("newline", lines - 1);
-      }
+    const nextTetra = [];
+    for (let i = 1; i < 5; i++) {
+      nextTetra.push(
+        room.getTetraminos()[player.getTetra() + i].getTetraminos()
+      );
     }
-  };
+    socket.broadcast
+      .to(room.getRoomName())
+      .emit("oponents", room.getOponents());
+    socket.emit("nextTetra", nextTetra);
+    socket.emit("position", room.getPosition(socket.id));
+  }
+};
 
-export const gameOver = (io: Server, socket: Socket, payload: SocketData, rooms: Game[]) => {
+export const newLine = (
+  io: Server,
+  socket: Socket,
+  lines: number,
+  rooms: Game[]
+) => {
+  const room = rooms.find((room) => room.getPlayer(socket.id));
+  console.log(
+    `${room?.getPlayer(socket.id)?.getName()} completed ${lines} lines !`
+  );
+  if (room) {
+    room.getPlayer(socket.id)?.setScore(lines);
+    if (lines - 1 > 0) {
+      io.to(room.getRoomName()).emit(
+        "info",
+        `Player ${room.getPlayer(socket.id)?.getName()} gift everyone a malus !`
+      );
+      socket.broadcast.to(room.getRoomName()).emit("newline", lines - 1);
+    }
+  }
+};
+
+export const gameOver = (
+  io: Server,
+  socket: Socket,
+  payload: SocketData,
+  rooms: Game[]
+) => {
   const room = rooms.find((el) => el.getRoomName() === payload.room);
   if (room && room.getStatus() === "Playing") {
     room.getPlayer(socket.id)?.setStatus("Game Over");
@@ -142,7 +161,6 @@ export const gameOver = (io: Server, socket: Socket, payload: SocketData, rooms:
       });
     } else if (!winner && room.getPlayers().length === 1) {
       room.setStatus("Waiting");
-      console.log(room.getPlayers()[0]);
       room.resetTetraminos();
       io.to(room.getAdmin().getId()).emit("admin");
       room.getPlayers().forEach((player) => {
@@ -150,7 +168,6 @@ export const gameOver = (io: Server, socket: Socket, payload: SocketData, rooms:
         player.setScore(0);
         player.setShadow(undefined);
       });
-      console.log(room.getPlayers()[0]);
     } else {
       socket.broadcast
         .to(room.getRoomName())
@@ -172,11 +189,16 @@ export const leaveRoom = (io: Server, socket: Socket, rooms: Game[]) => {
         delete rooms[index];
         rooms.splice(index, 1);
       } else {
-        gameOver(io, socket, {
-          name: player.getName(),
-          room: room.getRoomName(),
-          tetraminos: undefined,
-        }, rooms);
+        gameOver(
+          io,
+          socket,
+          {
+            name: player.getName(),
+            room: room.getRoomName(),
+            tetraminos: undefined,
+          },
+          rooms
+        );
         room.removePlayer(player);
         io.to(room.getAdmin().getId()).emit("admin");
         const players = room.getPlayers();
