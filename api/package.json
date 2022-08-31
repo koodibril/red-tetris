@@ -8,6 +8,7 @@
   "scripts": {
     "start": "tsc && node dist/server.js",
     "dev": "nodemon src/server.ts --exec \"npm run lint && ts-node src/server.ts\"",
+    "build": "tsc -p .",
     "test": "npx jest",
     "lint": "eslint \"./src/**/*.ts\"",
     "format": "eslint \"src/**/*.ts\" --fix"

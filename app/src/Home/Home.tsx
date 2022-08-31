@@ -19,7 +19,6 @@ const Home: React.FC = () => {
     setScore,
     setMerge,
     listenToNewTetra,
-    listenToGameStatus,
     listenToMalus,
     gameOver,
     endTetra,
@@ -68,11 +67,9 @@ const Home: React.FC = () => {
   };
   useEffect(() => {
     listenToNewTetra(socket);
-    listenToGameStatus(socket);
     listenToMalus(socket);
     return () => {
       socket.off("newTetra");
-      socket.off("winner");
       socket.off("newline");
     };
   }, [merge]);

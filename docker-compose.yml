@@ -1,0 +1,9 @@
+version: '3'
+services:
+    matcha-app:
+      build: .
+      container_name: matcha
+      environment:
+        - NODE_ENV=Prod
+      ports:
+        - 80:3001

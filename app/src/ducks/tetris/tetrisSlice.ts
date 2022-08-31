@@ -10,7 +10,8 @@ export interface Oponent {
 }
 
 export interface TetrisState {
-  gameStatus: "Winner" | "Waiting" | "Game Over" | "Playing";
+  gameStatus: "Waiting" | "Playing";
+  status: "Game Over" | "Winner" | "Playing" | "Waiting";
   tetra: Tetraminos | undefined;
   score: number;
   info: string[];
@@ -25,6 +26,7 @@ export interface TetrisState {
 
 const initialState: TetrisState = {
   gameStatus: "Waiting",
+  status: "Waiting",
   tetra: undefined,
   score: 0,
   info: [],
@@ -41,13 +43,19 @@ export const tetrisSlice = createSlice({
   name: "Tetris",
   initialState,
   reducers: {
-    setStatus: (state, action: PayloadAction<TetrisState["gameStatus"]>) => {
+    setStatus: (state, action: PayloadAction<TetrisState["status"]>) => {
+      state.status = action.payload;
+    },
+    setGameStatus: (state, action: PayloadAction<TetrisState["gameStatus"]>) => {
       state.gameStatus = action.payload;
     },
     setTetra: (state, action: PayloadAction<TetrisState["tetra"]>) => {
       state.tetra = action.payload;
-      if (state.gameStatus !== "Playing") {
-        state.gameStatus = "Playing";
+      if (state.status !== "Playing") {
+        state.merge = undefined;
+        state.oponents = undefined;
+        state.score = 0;
+        state.status = "Playing";
       }
     },
     setRoom: (state, action: PayloadAction<TetrisState["room"]>) => {
@@ -111,5 +119,6 @@ export const {
   setRoom,
   setName,
   setOponents,
+  setGameStatus
 } = tetrisSlice.actions;
 export default tetrisSlice.reducer;

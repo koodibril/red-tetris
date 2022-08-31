@@ -62,6 +62,7 @@ export const startGame = (
       room.setTetraminos(tetra);
       nextTetra.push(tetra.getTetraminos());
     }
+    io.to(room.getRoomName()).emit("gameStatus", "Playing");
     io.to(room.getRoomName()).emit("nextTetra", nextTetra);
     room.setStatus("Playing");
     io.to(room.getRoomName()).emit("newTetra", newTetra.getTetraminos());
@@ -140,6 +141,7 @@ export const gameOver = (
     socket.broadcast
       .to(room.getRoomName())
       .emit("oponents", room.getOponents());
+    socket.emit("status", "Game Over");
     const winner = room.checkWinner();
     if (winner) {
       winner.setStatus("Winner");
@@ -153,13 +155,14 @@ export const gameOver = (
       room.setStatus("Waiting");
       room.resetTetraminos();
       io.to(room.getAdmin().getId()).emit("admin");
-      io.to(winner.getId()).emit("winner");
+      io.to(winner.getId()).emit("status", "Winner");
       room.getPlayers().forEach((player) => {
         player.setTetra(0);
         player.setScore(0);
         player.setShadow(undefined);
       });
     } else if (!winner && room.getPlayers().length === 1) {
+      socket.emit("status", "Game Over");
       room.setStatus("Waiting");
       room.resetTetraminos();
       io.to(room.getAdmin().getId()).emit("admin");
@@ -169,10 +172,12 @@ export const gameOver = (
         player.setShadow(undefined);
       });
     } else {
+      socket.emit("status", "Game Over");
       socket.broadcast
         .to(room.getRoomName())
         .emit("oponents", room.getOponents());
     }
+    io.to(room.getRoomName()).emit("gameStatus", room.getStatus());
     io.to(room.getRoomName()).emit(
       "info",
       `Player ${payload.name} loose the game !`

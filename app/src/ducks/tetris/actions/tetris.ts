@@ -16,6 +16,7 @@ import {
   setRoom,
   setName,
   setOponents,
+  setGameStatus,
 } from "../tetrisSlice";
 import { Tetraminos } from "../../../Home/components/Tetraminos/Tetraminos.d";
 import { Socket } from "socket.io-client";
@@ -29,8 +30,14 @@ const listenToNewTetra = (socket: Socket) => (dispatch: AppDispatch) => {
 };
 
 const listenToGameStatus = (socket: Socket) => (dispatch: AppDispatch) => {
-  socket.on("winner", () => {
-    dispatch(setStatus("Winner"));
+  socket.on("gameStatus", (payload: TetrisState["gameStatus"]) => {
+    dispatch(setGameStatus(payload));
+  });
+};
+
+const listenToStatus = (socket: Socket) => (dispatch: AppDispatch) => {
+  socket.on("status", (payload: TetrisState["status"]) => {
+    dispatch(setStatus(payload));
   });
 };
 
@@ -139,9 +146,6 @@ export const addMalus = (socket: Socket, lines: number) => {
 
 export const start =
   (socket: Socket, room: string, name: string) => (dispatch: AppDispatch) => {
-    dispatch(setMerge(undefined));
-    dispatch(setOponents(undefined));
-    dispatch(setScore(0));
     socket.emit("order:start", {
       room: room,
       name: name,
@@ -173,6 +177,8 @@ export const useTetrisActions = () => {
       listenToNewTetra: (socket: Socket) => dispatch(listenToNewTetra(socket)),
       listenToGameStatus: (socket: Socket) =>
         dispatch(listenToGameStatus(socket)),
+      listenToStatus: (socket: Socket) =>
+        dispatch(listenToStatus(socket)),
       listenToMalus: (socket: Socket) => dispatch(listenToMalus(socket)),
       gameOver: (
         socket: Socket,

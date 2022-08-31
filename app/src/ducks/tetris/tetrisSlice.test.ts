@@ -28,6 +28,7 @@ const tetraminos =
 const initialState: TetrisState = {
     gameStatus: "Waiting",
     tetra: undefined,
+    status: "Waiting",
     score: 0,
     info: [],
     admin: false,

@@ -1,5 +1,6 @@
 import { Game } from "../classes/Game";
 import { SocketData } from "./socket.d";
+import { AddressInfo } from "net";
 import {
   endTetra,
   gameOver,
@@ -26,8 +27,8 @@ describe("red-tetris", () => {
     const httpServer = http.createServer();
     io = new Server(httpServer);
     httpServer.listen(() => {
-      const port = httpServer.address().port;
-      clientSocket = new Client(`http://localhost:${port}`);
+      const { port } = httpServer.address() as AddressInfo;
+      clientSocket = new (Client as any)(`http://localhost:${port}`);
       io.on("connection", (socket: any) => {
         serverSocket = socket;
       });
