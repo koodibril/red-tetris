@@ -5,6 +5,7 @@ import { socket } from "../../../hooks/useSocket";
 import GridComponent from "../Grid/Grid";
 import { Oponent } from "../../../ducks/tetris/tetrisSlice";
 import { generateGrid } from "../../../utils/utils";
+import { calculateStyles } from "./OponentsActions";
 
 const Oponents: React.FC<{ side: boolean }> = (props) => {
   const { listenToOponents } = useTetrisActions();
@@ -18,48 +19,7 @@ const Oponents: React.FC<{ side: boolean }> = (props) => {
   const generateGrids = useMemo(() => {
     const users = position[1] - 1;
     const id = socket.id;
-    const styles = {
-      cellSize: "",
-      borderSize: "",
-      paddingTop: "",
-      paddingLeft: "",
-      paddingRight: "",
-      paddingBottom: "",
-    };
-    switch (true) {
-      case users <= 2:
-        styles.cellSize = "30px";
-        styles.borderSize = "10px";
-        styles.paddingLeft = "5%";
-        styles.paddingTop = "10%";
-        styles.paddingBottom = "0px";
-        styles.paddingRight = "5%";
-        break;
-      case users <= 4:
-        styles.cellSize = "20px";
-        styles.borderSize = "5px";
-        styles.paddingLeft = "5%";
-        styles.paddingTop = "5%";
-        styles.paddingBottom = "0px";
-        styles.paddingRight = "5%";
-        break;
-      case users <= 8:
-        styles.cellSize = "15px";
-        styles.borderSize = "5px";
-        styles.paddingLeft = "5px";
-        styles.paddingTop = "10%";
-        styles.paddingBottom = "0px";
-        styles.paddingRight = "5px";
-        break;
-      case users <= 16:
-        styles.cellSize = "8px";
-        styles.borderSize = "2px";
-        styles.paddingLeft = "5%";
-        styles.paddingTop = "10%";
-        styles.paddingBottom = "0px";
-        styles.paddingRight = "0px";
-        break;
-    }
+    const styles = calculateStyles(users);
     if (props.side) {
       //we are on the right
       if (oponents) {
@@ -83,6 +43,7 @@ const Oponents: React.FC<{ side: boolean }> = (props) => {
               ></GridComponent>
             );
           }
+          return null;
         });
       } else {
         return [...Array(users)].map((e, index) => {

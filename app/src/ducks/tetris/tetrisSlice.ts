@@ -60,7 +60,6 @@ export const tetrisSlice = createSlice({
       state.tetra = initialState.tetra;
     },
     setMalus: (state, action: PayloadAction<number>) => {
-      console.log("ho no");
       const merge = state.merge;
       const lines = action.payload;
       if (merge) {

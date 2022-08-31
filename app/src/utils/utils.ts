@@ -1,51 +1,48 @@
 import { Cell } from "../Home/components/Grid/Grid.d";
 
 export const matrixSizeLeft = (matrix: number[][]) => {
-  let matrixLength = 4;
-  matrix.map((row: number[]) => {
-    let rowLength = 4;
-    row.map((cell: number, cIndex: number) => {
-      if (cell === 1 && cIndex < rowLength) {
-        rowLength = cIndex;
+  let matrixLength = matrix.length;
+  for (let i = 0; i < matrixLength; i++) {
+    for (let j = 0; j < matrixLength; j++) {
+      if (matrix[j][i] === 1) {
+        if (i === 0) {
+          return 0;
+        }
+        return (i);
       }
-    });
-    if (rowLength < matrixLength) {
-      matrixLength = rowLength;
     }
-  });
-  return matrixLength;
+  }
+  return 0;
 };
 
 export const matrixSizeRight = (matrix: number[][]) => {
-  let matrixLength = 1;
-  matrix.map((row: number[]) => {
-    let rowLength = 1;
-    row.map((cell: number, cIndex: number) => {
-      if (cell === 1 && cIndex > rowLength) {
-        rowLength = cIndex;
+  let matrixLength = matrix.length;
+  for (let i = matrixLength - 1; i >= 0; i--) {
+    for (let j = 0; j < matrixLength; j++) {
+      if (matrix[j][i] === 1) {
+        if (i === matrixLength - 1) {
+          return 0;
+        }
+        return ((i - (matrixLength - 1)) * -1);
       }
-    });
-    if (rowLength > matrixLength) {
-      matrixLength = rowLength;
     }
-  });
-  return matrixLength;
+  }
+  return 0;
 };
 
 export const matrixSizeBottom = (matrix: number[][]) => {
-  let matrixLength = 1;
-  matrix.map((row: number[], rIndex: number) => {
-    let rowLength = 1;
-    row.map((cell: number) => {
-      if (cell === 1 && rIndex > rowLength) {
-        rowLength = rIndex;
+  let matrixLength = matrix.length;
+  for (let i = matrixLength - 1; i >= 0; i--) {
+    for (let j = 0; j < matrixLength; j++) {
+      if (matrix[i][j] === 1) {
+        if (i === matrixLength - 1) {
+          return 0;
+        }
+        return ((i - (matrixLength - 1)) * -1);
       }
-    });
-    if (rowLength > matrixLength) {
-      matrixLength = rowLength;
     }
-  });
-  return matrixLength;
+  }
+  return 0;
 };
 
 export const copyMatrix = (toCopy: number[][]) => {

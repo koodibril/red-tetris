@@ -40,7 +40,7 @@ const listenToMalus = (socket: Socket) => (dispatch: AppDispatch) => {
   });
 };
 
-const gameOver =
+export const gameOver =
   (
     socket: Socket,
     room: string,
@@ -71,7 +71,7 @@ const listenToServer = (socket: Socket) => (dispatch: AppDispatch) => {
   });
 };
 
-const joinRoom =
+export const joinRoom =
   (socket: Socket, room: string, name: string) => (dispatch: AppDispatch) => {
     socket.emit("order:join", {
       room: room,
@@ -81,7 +81,7 @@ const joinRoom =
     dispatch(setName(name));
   };
 
-const endTetra =
+export const endTetra =
   (
     socket: Socket,
     room: string,
@@ -133,11 +133,11 @@ const listenToOponents = (socket: Socket) => (dispatch: AppDispatch) => {
   });
 };
 
-const addMalus = (socket: Socket, lines: number) => {
+export const addMalus = (socket: Socket, lines: number) => {
   socket.emit("order:newLine", lines);
 };
 
-const start =
+export const start =
   (socket: Socket, room: string, name: string) => (dispatch: AppDispatch) => {
     dispatch(setMerge(undefined));
     dispatch(setOponents(undefined));

@@ -3,7 +3,7 @@ import "setimmediate";
 import { render, screen } from '@testing-library/react';
 import App from './App';
 import { Provider } from 'react-redux';
-import { store } from './store/configure';
+import { setupStore } from './store/configure';
 import { BrowserRouter } from 'react-router-dom';
 
 window.matchMedia = window.matchMedia || function() {
@@ -22,7 +22,7 @@ Object.defineProperty(window, 'location', {
   }
 });
   render(
-    <Provider store={store}>
+    <Provider store={setupStore()}>
     <BrowserRouter>
       <App />
     </BrowserRouter>

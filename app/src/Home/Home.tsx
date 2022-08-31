@@ -11,6 +11,7 @@ import { socket } from "../hooks/useSocket";
 import { useInterval } from "../hooks/useInterval";
 import { generateGrid } from "../utils/utils";
 import { checkMerge } from "./components/Tetraminos/TetraminosActions";
+import { calcScore, checkFullLines, printTetra } from "./HomeActions";
 
 const Home: React.FC = () => {
   const {
@@ -26,43 +27,8 @@ const Home: React.FC = () => {
   } = useTetrisActions();
   const { tetra, gameStatus, score, merge, name, room } = useTetris();
 
-  const createShadow = (tetra: Tetraminos, grid: Cell[][]) => {
-    const newTetra = { ...tetra };
-    while (!checkMerge(newTetra, grid)) {
-      newTetra.x = newTetra.x + 1;
-    }
-    newTetra.x = newTetra.x - 1;
-    return newTetra;
-  };
-  const printTetra = (tetra: Tetraminos, grid: Cell[][]) => {
-    const shadow = createShadow(tetra, grid);
-    tetra.shape.map((row: number[], rIndex: number) => {
-      row.map((cell: number, cIndex: number) => {
-        if (
-          cell === 1 &&
-          shadow.x + rIndex > 0 &&
-          shadow.x + rIndex < 21 &&
-          shadow.y + cIndex > 0 &&
-          shadow.y + cIndex < 11
-        ) {
-          grid[shadow.x + rIndex][shadow.y + cIndex].color = tetra.color;
-          grid[shadow.x + rIndex][shadow.y + cIndex].value = 4;
-        }
-        if (
-          cell === 1 &&
-          tetra.x + rIndex > 0 &&
-          tetra.x + rIndex < 21 &&
-          tetra.y + cIndex > 0 &&
-          tetra.y + cIndex < 11
-        ) {
-          grid[tetra.x + rIndex][tetra.y + cIndex].color = tetra.color;
-          grid[tetra.x + rIndex][tetra.y + cIndex].value = 2;
-        }
-      });
-    });
-  };
   const grid = useMemo(() => {
-    const grid: Cell[][] = generateGrid();
+    let grid: Cell[][] = generateGrid();
     if (merge) {
       for (let i = 0; i < 22; i++) {
         for (let j = 0; j < 12; j++) {
@@ -71,60 +37,14 @@ const Home: React.FC = () => {
       }
     }
     if (tetra) {
-      printTetra(tetra, grid);
+      grid = printTetra(tetra, grid);
     }
     return grid;
   }, [tetra, merge]);
-  const calcScore = (lines: number) => {
-    switch (lines) {
-      case 1:
-        setScore(score + 40);
-        break;
-      case 2:
-        setScore(score + 100);
-        break;
-      case 3:
-        setScore(score + 300);
-        break;
-      case 4:
-        setScore(score + 1200);
-        break;
-    }
-  };
-  const checkFullLines = (newMerge: Cell[][]) => {
-    let lines = 0;
-    newMerge.map((row, index) => {
-      let blocks = 0;
-      row.forEach((cell) => {
-        if (cell.value === 1) {
-          blocks++;
-        }
-      });
-      if (
-        !row.find(
-          (cell, index) => cell.value === 0 && index !== 0 && index !== 11
-        ) &&
-        blocks !== 12
-      ) {
-        const newLine = [];
-        for (let j = 0; j < 12; j++) {
-          if (index === 0 || j === 0 || index === 21 || j === 11) {
-            newLine.push({ value: 1, color: "grey" });
-          } else {
-            newLine.push({ value: 0, color: "lightgrey" });
-          }
-        }
-        lines++;
-        newMerge.splice(index, 1);
-        newMerge.splice(1, 0, newLine);
-      }
-    });
-    return lines;
-  };
   const mergeBoard = (tetra: Tetraminos) => {
     const newMerge = grid;
-    tetra.shape.map((row: number[], rIndex: number) => {
-      row.map((cell: number, cIndex: number) => {
+    tetra.shape.forEach((row: number[], rIndex: number) => {
+      row.forEach((cell: number, cIndex: number) => {
         if (
           (cell === 1 || cell === 3) &&
           tetra.x + rIndex > 0 &&
@@ -137,7 +57,7 @@ const Home: React.FC = () => {
       });
     });
     const lines = checkFullLines(newMerge);
-    calcScore(lines);
+    setScore(calcScore(lines, score));
     if (lines > 0) addMalus(socket, lines);
     setMerge(newMerge);
     if (newMerge[1].find((cell) => cell.value === 3)) {
