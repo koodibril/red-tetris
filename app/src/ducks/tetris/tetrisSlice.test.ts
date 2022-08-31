@@ -54,7 +54,8 @@ test('setAdmin', () => {
 test('setStatus', () => {
     const previousState = initialState;
     const nextState = {...initialState};
-    nextState.gameStatus = "Playing";
+    nextState.gameStatus = "Waiting";
+    nextState.status = "Playing";
     expect(reducer(previousState, setStatus("Playing"))).toEqual(nextState);
 })
 
@@ -62,7 +63,8 @@ test('setTetra', () => {
     const previousState = initialState;
     const nextState = {...initialState};
     nextState.tetra = tetraminos;
-    nextState.gameStatus = "Playing";
+    nextState.gameStatus = "Waiting";
+    nextState.status = "Playing";
     expect(reducer(previousState, setTetra(tetraminos))).toEqual(nextState);
 })
 

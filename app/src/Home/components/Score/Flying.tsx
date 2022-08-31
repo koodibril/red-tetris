@@ -29,7 +29,6 @@ const Score: React.FC = () => {
       socket.off("gameStatus");
     };
   }, []);
-  console.log(gameStatus, status, admin);
   return (
     <>
       {gameStatus === "Waiting" && status !== "Winner" && status !== "Game Over" ? (

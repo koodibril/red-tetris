@@ -14,9 +14,19 @@ window.matchMedia = window.matchMedia || function() {
     };
   };
 
-test('Uses preloaded state to render', () => {
+test('left side', () => {
     const store = setupStore();
     const oponents = [{
+        status: "Playing",
+        shadow: [[{value: 0, color: "test"}]],
+        id: "test",
+        name: "test",
+    },{
+        status: "Playing",
+        shadow: [[{value: 0, color: "test"}]],
+        id: "test",
+        name: "test",
+    },{
         status: "Playing",
         shadow: [[{value: 0, color: "test"}]],
         id: "test",
@@ -26,7 +36,34 @@ test('Uses preloaded state to render', () => {
     store.dispatch(setPosition([1,2]));
     store.dispatch(setStatus("Playing"));
   
-    renderWithProviders(<Oponents side={true}/>, { store })
+    renderWithProviders(<Oponents side={false}/>, { store })
     const nameApp = screen.getByText(/Playing/i);
     expect(nameApp).toBeInTheDocument();
   })
+
+  test('right side', () => {
+      const store = setupStore();
+      const oponents = [{
+          status: "Playing",
+          shadow: [[{value: 0, color: "test"}]],
+          id: "test",
+          name: "test",
+      },{
+          status: "Playing",
+          shadow: [[{value: 0, color: "test"}]],
+          id: "test",
+          name: "test",
+      },{
+        status: "Playing",
+        shadow: [[{value: 0, color: "test"}]],
+        id: "test",
+        name: "test",
+    }];
+      store.dispatch(setOponents(oponents));
+      store.dispatch(setPosition([1,2]));
+      store.dispatch(setStatus("Playing"));
+    
+      renderWithProviders(<Oponents side={true}/>, { store })
+      const nameApp = screen.getAllByText(/Playing/i);
+      expect(nameApp[0]).toBeInTheDocument();
+    })
