@@ -55,6 +55,8 @@ export class Player {
       case 4:
         this._score += 1200;
         break;
+      case 0:
+        this._score = 0;
     }
   }
 

@@ -43,12 +43,6 @@ export class Game {
   getPlayers() {
     return this._players;
   }
-  setPlayer(newPlayer: Player) {
-    this._players = this._players.map((player) => {
-      if (player.getId() === newPlayer.getId()) return newPlayer;
-      return player;
-    });
-  }
   addPlayer(newPlayer: Player) {
     this._players.push(newPlayer);
   }
